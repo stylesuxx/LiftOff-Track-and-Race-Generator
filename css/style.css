@@ -57,7 +57,7 @@ textarea {
 
 input,
 select {
-  width: 150px !important;
+  width: 130px !important;
 }
 
 #step-2 .form-group input {
@@ -70,4 +70,9 @@ label {
 
 textarea.disabled {
   color: rgba(0, 0, 0, 0.8);
+}
+
+
+.form-group.track-name label {
+  padding-left: 10px;
 }

@@ -55,9 +55,14 @@
 
               <p></p>
 
-              <div class='form-group'>
-                <label for='track-name'>Name:</label>
-                <input name='track-name' id='track-name' type='text' value='Your track name' class='form-control' />
+              <div class="form-group gate-checkbox">
+                <label for="gates-checkbox">Gates:</label>
+                <input type="checkbox" name="gates-checkbox" id="enable-gates" />
+              </div>
+
+              <div class="form-group gate-spacing hidden">
+                <label for="gate-spacing">Spacing:</label>
+                <input name="gate-spacing" id="gate-spacing" type="number" value=60 class='form-control' />
               </div>
 
               <p></p>
@@ -75,6 +80,12 @@
               <div class='form-group'>
                 <button id="preview" class="btn btn-default">Preview</button>
               </div>
+
+              <div class='form-group track-name'>
+                <label for='track-name'>Name:</label>
+                <input name='track-name' id='track-name' type='text' value='Your track name' class='form-control' />
+              </div>
+
               <div class='form-group generate-button hidden'>
                 <button id="generate" class="btn btn-success">Generate Track</button>
               </div>

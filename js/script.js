@@ -6,9 +6,11 @@
   var dpoint;
 
   var close = false;
+  var gatesEnabled = false;
 
   var points = [];
   var markers = [];
+  var gates = [];
 
   var $blueprintTemplate = $('<TrackBlueprint />', {
     'xsi:type': 'TrackBlueprintFlag'
@@ -107,6 +109,21 @@
     }
   }
 
+  class Line {
+    constructor(p0, p1) {
+      this.p0 = p0;
+      this.p1 = p1;
+    }
+  }
+
+  class Gate {
+    constructor(line, center, rotation=0) {
+      this.line = line;
+      this.center = center
+      this.rotation = rotation;
+    }
+  }
+
   $(document).ready(function() {
     /**
      * New point may be added until the track has been closed
@@ -149,17 +166,23 @@
      */
     $("#preview").on("click", function() {
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
-      var trackWidth = parseInt($('#track-width').val()) || 0;
-      placeMarkers(markerSpacing, trackWidth);
+      var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
+
+      placeMarkers(markerSpacing, gateSpacing);
 
       c.clearRect(0, 0, width, height);
       drawMarkers();
 
+      if(gatesEnabled) {
+        drawGates();
+      }
+
       $('.generate-button').removeClass('hidden');
     });
 
-    $('#single').on('change', function() {
-      $('.track-width').toggleClass('hidden');
+    $('#enable-gates').on('change', function() {
+      $('.gate-spacing').toggleClass('hidden');
+      gatesEnabled = !gatesEnabled;
     });
 
     /**
@@ -190,57 +213,84 @@
       $trackXML.find('lastTrackItemID').text(markers.length - 1);
 
       setTimeout(function() {
-        $(markers).each(function(index, item) {
-          var p = new Point(item.x, item.y);
-          p.x /= 10;
-          p.y /= 10;
-
-          if(p.y > (height / 10) / 2) {
-            p.x -= 30;
-            p.y -= 50;
-            p.y *= -1;
-          }
-          else {
-            p.x -= 30;
-            p.y += 50;
-            p.y *= -1;
-            p.y += 100;
-          }
-
+        $(markers).each(function(index, marker) {
+          var p = transfromCoords(marker);
           var $blueprint = getBlueprint(index, p, itemName);
           $trackXML.find('blueprints').append($blueprint);
         })
         .promise()
         .done(function() {
-          // Sanitize the XML, so the game does not comlain
-          var xmlString = (new XMLSerializer()).serializeToString(trackXML);
-          xmlString = xmlString.replace(/xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
-          xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
-          xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
-          xmlString = xmlString.replace(/itemid/g, 'itemID');
-          xmlString = xmlString.replace(/instanceid/g, 'instanceID');
-
-          $('.rendered-track').remove();
-          $('.content > div').append($('<div />', {
-            class: 'rendered-track'
-          })
-            .append($('<textarea />', {
-              text: xmlString,
-              autocomplete: 'off',
-              autocorrect: 'off',
-              autocapitalize: 'off',
-              spellcheck: 'false'
-            }).format({method: 'xml'}))
-          );
+          if(gatesEnabled) {
+            $trackXML.find('lastTrackItemID').text(markers.length + gates.length - 1);
+            $(gates).each(function(index, gate) {
+              var p = transfromCoords(gate.center);
+              var $blueprint = getBlueprint(index + markers.length, p, 'AirgateBigLiftoffDark01', gate.rotation + 90);
+              $trackXML.find('blueprints').append($blueprint);
+            })
+            .promise()
+            .done(function() {
+              attachXML(sanitizeXML(trackXML));
+            })
+          }
+          else {
+            attachXML(sanitizeXML(trackXML));
+          }
         });
       }, 100);
     })
   });
 
+  function transfromCoords(p) {
+    var p = new Point(p.x, p.y);
+    p.x /= 10;
+    p.y /= 10;
+
+    if(p.y > (height / 10) / 2) {
+      p.x -= 30;
+      p.y -= 50;
+      p.y *= -1;
+    }
+    else {
+      p.x -= 30;
+      p.y += 50;
+      p.y *= -1;
+      p.y += 100;
+    }
+
+    return p;
+  }
+
+  function attachXML(xml) {
+    $('.rendered-track').remove();
+    $('.content > div').append($('<div />', {
+      class: 'rendered-track'
+    })
+      .append($('<textarea />', {
+        text: xml,
+        autocomplete: 'off',
+        autocorrect: 'off',
+        autocapitalize: 'off',
+        spellcheck: 'false'
+      }).format({method: 'xml'}))
+    );
+  }
+
+  function sanitizeXML(xml) {
+    // Sanitize the XML, so the game does not comlain
+    var xmlString = (new XMLSerializer()).serializeToString(xml);
+    xmlString = xmlString.replace(/xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
+    xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
+    xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
+    xmlString = xmlString.replace(/itemid/g, 'itemID');
+    xmlString = xmlString.replace(/instanceid/g, 'instanceID');
+
+    return xmlString;
+  }
+
   /**
    * Return a blueprint DOM element
    */
-  function getBlueprint(id, p0, type) {
+  function getBlueprint(id, p0, type, rotation=0) {
     var $blueprint = $blueprintTemplate.clone();
 
     $blueprint.find('itemid').text(type);
@@ -248,6 +298,7 @@
     $blueprint.find('position x').text(p0.x);
     $blueprint.find('position y').text(0.1);
     $blueprint.find('position z').text(p0.y);
+    $blueprint.find('rotation y').text(rotation);
 
     return $blueprint;
   }
@@ -272,12 +323,12 @@
     addSegment();
   }
 
-  function placeMarkers(spacing, width) {
+  function placeMarkers(spacing, spacingGates) {
     var split = spacing;
-    var width = width;
+    var gateSplit = spacingGates;
 
     markers = [];
-    markers.push(points[0]);
+    gates = [];
 
     // Get length of all curves
     var totalLength = 0;
@@ -292,7 +343,12 @@
     var markerCount = Math.floor(totalLength / split);
     var rest = totalLength % split;
     split = split + (rest / markerCount);
-    var nextSplit = split;
+    var nextSplit = 0;
+
+    var gateCount = Math.floor(totalLength / gateSplit);
+    rest = totalLength % split;
+    gateSplit = gateSplit + (rest / gateCount);
+    var nextGateSplit = 0;
 
     for(var i = 0; i < points.length - 1; i += 2) {
       var p0 = points[i];
@@ -300,17 +356,26 @@
       var p2 = points[(i+2) % points.length];
 
       var length;
-      for(var j = 0; j < 1; j += 0.0001) {
+      for(var j = 0.0001; j < 1; j += 0.0001) {
         length = getBezierLengthAtTime(p0, p1, p2, j);
 
         if(length >= nextSplit) {
           nextSplit += split;
           var marker = getPointAtTime(p0, p1, p2, j);
+
           markers.push(marker);
+        }
+
+        if(length >= nextGateSplit) {
+          nextGateSplit += gateSplit;
+          var gate = getGate(p0, p1, p2, marker, j);
+
+          gates.push(gate);
         }
       }
 
       nextSplit -= length;
+      nextGateSplit -= length;
     }
   }
 
@@ -358,6 +423,33 @@
     var BA = B / A_2;
 
     return (A_32 * Sabc + A_2 * B * (Sabc - C_2) + (4 * C * A - B * B) * Math.log((2 * A_2 + BA + Sabc) / (BA + C_2))) / (4 * A_32);
+  }
+
+  function getGate(p0, p1, p2, p, t) {
+    var p11 = new Point(0, 0);
+
+    p11.x = (1 - t) * p0.x + t * p1.x;
+    p11.y = (1 - t) * p0.y + t * p1.y;
+
+    var c = 15;
+    var b = Math.sqrt(Math.pow((p.x - p11.x), 2) + Math.pow((p.y - p11.y), 2));
+    var alpha = Math.acos((b / c) * Math.PI / 180);
+
+    var l1 = new Point();
+    var l2 = new Point();
+
+    l1.x = (p.x) + Math.tan(alpha) * Math.PI / 180 * -1 * (p11.y - p.y);
+    l1.y = (p.y) + Math.tan(alpha) * Math.PI / 180 * (p11.x - p.x);
+
+    l2.x = (p.x) + Math.tan(-alpha) * Math.PI / 180 * -1 * (p11.y - p.y);
+    l2.y = (p.y) + Math.tan(-alpha) * Math.PI / 180 * (p11.x - p.x);
+
+    var angle = Math.atan2(p11.y - p.y, p11.x - p.x);
+
+    var line = new Line(l1, l2);
+    var gate = new Gate(line, p, angle * 180 / Math.PI );
+
+    return gate;
   }
 
   // t 0..1
@@ -428,6 +520,16 @@
       c.beginPath();
       c.arc(markers[i].x, markers[i].y, style.smallPoint.radius, style.smallPoint.arc1, style.point.arc2, true );
       c.fill();
+      c.stroke();
+    }
+  }
+
+  function drawGates() {
+    for(var gate of gates) {
+      var gate = gate.line;
+      c.beginPath();
+      c.moveTo(gate.p0.x, gate.p0.y);
+      c.lineTo(gate.p1.x, gate.p1.y)
       c.stroke();
     }
   }
