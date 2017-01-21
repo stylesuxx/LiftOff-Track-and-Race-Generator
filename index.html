@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>Liftoff track builder</title>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <div class="row header">
+        <div class="col-md-12">
+          <h1>Liftoff Track builder</h1>
+        </div>
+      </div>
+
+      <div class="controlls row">
+
+        <div id="step-1" class="col-md-12 form-inline">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <button id="add-point" class="btn btn-default">Add point</button>
+                </div>
+                <div class="col-md-6">
+                  <button id="close" class="btn btn-default">Close Track</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9">
+              <p class="help-block">
+                New points are added to the bottom left. Click <i>Close Track</i> to connect start and end point.<br />
+                Tip: Press <i>STRG</i> and scroll your <i>mouse wheel</i> to make the track editor fit your screen.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div id="step-2"  class="col-md-12 form-inline">
+          <div class="row">
+            <div class='col-md-5'>
+
+              <div class='form-group'>
+                <label for="marker-spacing" class='control-label'>Spacing:</label>
+                <input name="marker-spacing" id="marker-spacing" type="number" value=20 class='form-control' />
+              </div>
+
+              <div class='form-group'>
+                <label for="marker-type">Type:</label>
+                <select name="marker-type" id="marker-type" class='form-control'>
+                </select>
+              </div>
+
+              <p></p>
+
+              <div class='form-group'>
+                <label for='track-name'>Name:</label>
+                <input name='track-name' id='track-name' type='text' value='Your track name' class='form-control' />
+              </div>
+
+              <p></p>
+            </div>
+
+            <div class='col-md-7'>
+              <div class="form-group hidden">
+                <label for="marker-spacing">Single line:</label>
+                <input type="checkbox" name="single" id="single" checked="checked" />
+              </div>
+              <div class="form-group track-width hidden">
+                <label for="track-width">Width:</label>
+                <input name="track-width" id="track-width" type="number" value=0 />
+              </div>
+              <div class='form-group'>
+                <button id="preview" class="btn btn-default">Preview</button>
+              </div>
+              <div class='form-group generate-button hidden'>
+                <button id="generate" class="btn btn-success">Generate Track</button>
+              </div>
+              <p class="help-block">
+                Set the space between the markers, the lower the number, the closer together they will be. After the track has been generated copy the result to a file in a new folder in your track directory. Liftoff reads the tracks on game start, so make sure to do this before starting the game.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="row content">
+        <div class="col-md-12">
+          <div class="canvas">
+            <canvas id='canvas' height="1000" width="600" class="quadratic"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://zachofalltrades.github.io/jquery.format/jquery.format.js"></script>
+    <script src="js/script.js"></script>
+  </body>
+</html>

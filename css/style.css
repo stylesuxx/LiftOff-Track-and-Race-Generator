@@ -1,0 +1,73 @@
+body {
+  zoom: 100%;
+}
+
+canvas {
+  background:#f7f7f7;
+  width: 600px;
+  height: 1000px;
+}
+
+#step-2 {
+  display: none;
+}
+
+textarea {
+  width: 100%;
+}
+
+.container {
+  padding-bottom: 15px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.content > div {
+  display: flex;
+  margin: 10px 0;
+}
+
+.rendered-track {
+  position: relative;
+  margin-left: 10px;
+  width: 100%;
+  display: flex;
+}
+
+.rendered-track .generating {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  vertical-align: center;
+  text-align: center;
+  padding-top: 30%;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#step-1 button {
+  width: 100%;
+  height: 47px;
+}
+
+input,
+select {
+  width: 150px !important;
+}
+
+#step-2 .form-group input {
+  margin-right: 10px;
+}
+
+label {
+  width: 64px;
+}
+
+textarea.disabled {
+  color: rgba(0, 0, 0, 0.8);
+}
