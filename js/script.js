@@ -1,11 +1,14 @@
 (function() {
+  var canvas;
+  var width, height;
 
-  var canvas, style, drag = null, dpoint;
+  var drag = null;
+  var dpoint;
+
   var close = false;
-  var finish = false;
+
   var points = [];
   var markers = [];
-  var width, height;
 
   var $blueprintTemplate = $('<TrackBlueprint />', {
     'xsi:type': 'TrackBlueprintFlag'
@@ -20,15 +23,9 @@
   )
   .append(
     $('<rotation />')
-    .append($('<x />', {
-      text: 0.0
-    }))
-    .append($('<y />', {
-      text: 0.0
-    }))
-    .append($('<z />', {
-      text: 0.0
-    }))
+    .append($('<x />', { text: 0.0 }))
+    .append($('<y />', { text: 0.0 }))
+    .append($('<z />', { text: 0.0 }))
   )
   .append($('<purpose />', {
     text: 'Functional'
@@ -73,6 +70,36 @@
     }
   ];
 
+  var style = {
+    thinCurve: {
+      width: 1,
+      color: 'rgba(0, 255, 0, 1)'
+    },
+    curve: {
+      width: 6,
+      color: 'hsla(216, 91%, 50%, 0.95)'
+    },
+    pline: {
+      width: 2,
+      color: ''
+    },
+    circles: {
+      width: 2,
+      color: '#000',
+      fill: 'hsla(100, 93%, 50%, 1)'
+    },
+    point: {
+      radius: 12,
+      arc1: 0,
+      arc2: 2 * Math.PI
+    },
+    smallPoint: {
+      radius: 5,
+      arc1: 0,
+      arc2: 2 * Math.PI
+    }
+  };
+
   class Point {
     constructor(x=0, y=0) {
       this.x = x;
@@ -81,6 +108,9 @@
   }
 
   $(document).ready(function() {
+    /**
+     * New point may be added until the track has been closed
+     */
     $('#add-point').on('click', function() {
       if(!close) {
         addSegment();
@@ -227,36 +257,6 @@
     width = canvas.width;
     height = canvas.height;
 
-    style = {
-      thinCurve: {
-        width: 1,
-        color: 'rgba(0, 255, 0, 1)'
-      },
-      curve: {
-        width: 6,
-        color: 'hsla(216, 91%, 50%, 0.95)'
-      },
-      pline: {
-        width: 2,
-        color: ''
-      },
-      circles: {
-        width: 2,
-        color: '#000',
-        fill: 'hsla(100, 93%, 50%, 1)'
-      },
-      point: {
-        radius: 12,
-        arc1: 0,
-        arc2: 2 * Math.PI
-      },
-      smallPoint: {
-        radius: 5,
-        arc1: 0,
-        arc2: 2 * Math.PI
-      }
-    }
-
     // line style
     c.lineCap = 'round';
     c.lineJoin = 'round';
@@ -266,16 +266,18 @@
     canvas.onmousemove = dragging;
     canvas.onmouseup = canvas.onmouseout = dragStop;
 
+    // Push the start point and add the first Segment
     var start = new Point(20, 20);
     points.push(start);
     addSegment();
   }
 
   function placeMarkers(spacing, width) {
-    markers = [];
-    markers.push(points[0]);
     var split = spacing;
     var width = width;
+
+    markers = [];
+    markers.push(points[0]);
 
     // Get length of all curves
     var totalLength = 0;
@@ -285,6 +287,8 @@
     }
     totalLength += getBezierLength(points[pointAmount-1], points[pointAmount], points[0]);
 
+    // Optimize the split, so that the markers are equally spaced on the total
+    // available length.
     var markerCount = Math.floor(totalLength / split);
     var rest = totalLength % split;
     split = split + (rest / markerCount);
@@ -490,5 +494,12 @@
   }
 
   canvas = document.getElementById('canvas');
-  if(canvas.getContext) init();
+  if(canvas.getContext) {
+    init();
+  }
+  else {
+    $('.header').append($('<div />', {
+      text: 'Your browser does not support Canvas, you should update...'
+    }));
+  }
 })();
