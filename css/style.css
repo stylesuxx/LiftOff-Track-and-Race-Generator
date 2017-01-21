@@ -3,7 +3,8 @@ body {
 }
 
 h1 {
-  margin-top: 10px;
+  padding: 10px;
+  font-size: 26px;
 }
 
 canvas {
@@ -24,7 +25,21 @@ textarea {
   display: none !important;
 }
 
+.container {
+  padding-top: 10px;
+  position: relative;
+}
+
+.header {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  background: rgba(255, 255, 255, 0.8);right: 50px;
+  bottom: 11px;
+}
+
 .content > div {
+  position: relative;
   display: flex;
   margin: 10px 0;
 }
@@ -60,8 +75,13 @@ select {
   width: 130px !important;
 }
 
-#step-2 .form-group input {
+#step-2 .form-group .right input {
   margin-right: 10px;
+  margin-left: 10px;
+}
+
+#step-2 .form-group {
+  height: 34px;
 }
 
 label {
@@ -75,4 +95,13 @@ textarea.disabled {
 
 .form-group.track-name label {
   padding-left: 10px;
+}
+
+.footer {
+  padding-top: 15px;
+  text-align: center;
+}
+
+.main {
+  position: relative;
 }

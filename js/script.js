@@ -7,6 +7,8 @@
 
   var close = false;
   var gatesEnabled = false;
+  var singleLine = true;
+  var id;
 
   var points = [];
   var markers = [];
@@ -167,8 +169,10 @@
     $("#preview").on("click", function() {
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
+      var trackWidth = $('#track-width').val() || 16;
+      id = Math.random().toString(36).substring(7);
 
-      placeMarkers(markerSpacing, gateSpacing);
+      placeMarkers(markerSpacing, gateSpacing, trackWidth);
 
       c.clearRect(0, 0, width, height);
       drawMarkers();
@@ -183,6 +187,11 @@
     $('#enable-gates').on('change', function() {
       $('.gate-spacing').toggleClass('hidden');
       gatesEnabled = !gatesEnabled;
+    });
+
+    $('#single').on('change', function() {
+      $('.track-width').toggleClass('hidden');
+      singleLine = !singleLine;
     });
 
     /**
@@ -202,43 +211,139 @@
       })
       $('.rendered-track').append($generating);
 
-      var trackXML = $.parseXML('<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment>LiftoffArena</environment><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>').documentElement;
-      var $trackXML = $(trackXML);
-      var id = Math.random().toString(36).substring(7);
-      var trackName = $('#track-name').val() || 'Edgy no name track';
-      var itemName = $('#marker-type').val() || 'DiscConeBlue01';
+      generateTrack();
 
-      $trackXML.find('localID str').text(id);
-      $trackXML.find('name').text(trackName);
-      $trackXML.find('lastTrackItemID').text(markers.length - 1);
+      if(gatesEnabled) {
+        $('.race').removeClass('hidden');
+      }
+      else {
+        $('.race').addClass('hidden');
+      }
+    });
 
-      setTimeout(function() {
-        $(markers).each(function(index, marker) {
-          var p = transfromCoords(marker);
-          var $blueprint = getBlueprint(index, p, itemName);
-          $trackXML.find('blueprints').append($blueprint);
-        })
-        .promise()
-        .done(function() {
-          if(gatesEnabled) {
-            $trackXML.find('lastTrackItemID').text(markers.length + gates.length - 1);
-            $(gates).each(function(index, gate) {
-              var p = transfromCoords(gate.center);
-              var $blueprint = getBlueprint(index + markers.length, p, 'AirgateBigLiftoffDark01', gate.rotation + 90);
-              $trackXML.find('blueprints').append($blueprint);
-            })
-            .promise()
-            .done(function() {
-              attachXML(sanitizeXML(trackXML));
-            })
-          }
-          else {
-            attachXML(sanitizeXML(trackXML));
-          }
-        });
-      }, 100);
-    })
+    /**
+     * When generating a race, a start point needs no be placed.
+     * Start point is the position of the first gate. The first gate to pass is
+     * the second gate. Start and finish are both the second gate.
+     */
+    $('#generate-race').on('click', function() {
+      var $generating = $('<div />', {
+        class: 'generating',
+        text: 'Generating Race - this may take some time...'
+      })
+      $('.rendered-track').append($generating);
+
+      generateRace();
+    });
   });
+
+  function generateRace() {
+    var $checkpointTemplate = $('<RaceCheckpointPassage />')
+    .append($('<uniqueId />'))
+    .append($('<checkPointID />'))
+    .append($('<passageType />'))
+    .append($('<directionality />'))
+    .append(
+      $('<nextPassageIDs />')
+      .append($('<string />'))
+    );
+
+    var raceId = Math.random().toString(36).substring(7);
+    var raceXML = $.parseXML('<?xml version="1.0" encoding="utf-16"?><Race xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.2</gameVersion><localID><str /><version>1</version><type>RACE</type></localID><name /><description /><dependencies><dependency><str /><version>1</version><type>TRACK</type></dependency></dependencies><checkPointPassages /><requiredLaps>3</requiredLaps><spawnPointID>-1</spawnPointID><validity>Valid</validity></Race>').documentElement;
+    var $raceXML = $(raceXML);
+    var raceName = $('#race-name').val() || 'Edgy no name race';
+    var spawnPointID = markers.length + gates.length;
+
+    $raceXML.find('localID str').text(raceId);
+    $raceXML.find('name').text(raceName);
+    $raceXML.find('dependencies dependency str').text(id);
+    $raceXML.find('spawnPointID').text(spawnPointID);
+
+    var indexOffset = markers.length;
+    setTimeout(function() {
+
+      $(gates).each(function(index, gate) {
+        var idx = indexOffset + parseInt(index);
+        var $checkpoint = $checkpointTemplate.clone();
+
+        $checkpoint.find('checkPointID').text(idx);
+        $checkpoint.find('uniqueId').text(index);
+        $checkpoint.find('passageType').text('Pass');
+        $checkpoint.find('directionality').text('LeftToRight');
+        $checkpoint.find('nextPassageIDs string').text((index + 1));
+
+        if(index == 0) {
+          $checkpoint.find('nextPassageIDs string').text('Finish');
+        }
+
+        if(index == 1) {
+          //First gate is start and end gate
+          $checkpoint.find('uniqueId').text('Start');
+          $checkpoint.find('passageType').text('Start');
+          $checkpoint.find('directionality').text('RightToLeft');
+
+          $finish = $checkpoint.clone();
+          $finish.find('uniqueId').text('Finish');
+          $finish.find('passageType').text('Finish');
+          $finish.find('nextPassageIDs string').remove();
+
+          $raceXML.find('checkPointPassages').append($finish);
+        }
+
+        if(index == gates.length - 1) {
+          $checkpoint.find('nextPassageIDs string').text(0);
+        }
+
+        $raceXML.find('checkPointPassages').append($checkpoint);
+      })
+      .promise()
+      .done(function() {
+        attachXML(sanitizeXML(raceXML));
+      });
+    }, 100);
+  }
+
+  function generateTrack() {
+    var trackXML = $.parseXML('<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment>LiftoffArena</environment><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>').documentElement;
+    var $trackXML = $(trackXML);
+    var trackName = $('#track-name').val() || 'Edgy no name track';
+    var itemName = $('#marker-type').val() || 'DiscConeBlue01';
+
+    $trackXML.find('localID str').text(id);
+    $trackXML.find('name').text(trackName);
+    $trackXML.find('lastTrackItemID').text(markers.length - 1);
+
+    setTimeout(function() {
+      $(markers).each(function(index, marker) {
+        var p = transfromCoords(marker);
+        var $blueprint = getBlueprint(index, p, itemName);
+        $trackXML.find('blueprints').append($blueprint);
+      })
+      .promise()
+      .done(function() {
+        if(gatesEnabled) {
+          $trackXML.find('lastTrackItemID').text(markers.length + gates.length - 1);
+          $(gates).each(function(index, gate) {
+            var p = transfromCoords(gate.center);
+            var $blueprint = getBlueprint(index + markers.length, p, 'AirgateBigLiftoffDark01', gate.rotation + 90);
+            $trackXML.find('blueprints').append($blueprint);
+          })
+          .promise()
+          .done(function() {
+            var first = transfromCoords(gates[0].center);
+            var $blueprint = getBlueprint(markers.length + gates.length, first, 'SpawnPointSingle01', gates[0].rotation - 90);
+            $trackXML.find('blueprints').append($blueprint);
+            $trackXML.find('lastTrackItemID').text(markers.length + gates.length);
+
+            attachXML(sanitizeXML(trackXML));
+          })
+        }
+        else {
+          attachXML(sanitizeXML(trackXML));
+        }
+      });
+    }, 100);
+  }
 
   function transfromCoords(p) {
     var p = new Point(p.x, p.y);
@@ -278,11 +383,16 @@
   function sanitizeXML(xml) {
     // Sanitize the XML, so the game does not comlain
     var xmlString = (new XMLSerializer()).serializeToString(xml);
-    xmlString = xmlString.replace(/xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
+    xmlString = xmlString.replace(/ xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
     xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
     xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
     xmlString = xmlString.replace(/itemid/g, 'itemID');
     xmlString = xmlString.replace(/instanceid/g, 'instanceID');
+    xmlString = xmlString.replace(/uniqueid/g, 'uniqueId');
+    xmlString = xmlString.replace(/checkpointid/g, 'checkPointID');
+    xmlString = xmlString.replace(/passagetype/g, 'passageType');
+    xmlString = xmlString.replace(/nextpassageids/g, 'nextPassageIDs');
+    xmlString = xmlString.replace(/racecheckpointpassage/g, 'RaceCheckpointPassage');
 
     return xmlString;
   }
@@ -323,9 +433,10 @@
     addSegment();
   }
 
-  function placeMarkers(spacing, spacingGates) {
+  function placeMarkers(spacing, spacingGates, trackWidth) {
     var split = spacing;
     var gateSplit = spacingGates;
+    var trackWidth = trackWidth;
 
     markers = [];
     gates = [];
@@ -346,7 +457,7 @@
     var nextSplit = 0;
 
     var gateCount = Math.floor(totalLength / gateSplit);
-    rest = totalLength % split;
+    rest = totalLength % gateSplit;
     gateSplit = gateSplit + (rest / gateCount);
     var nextGateSplit = 0;
 
@@ -363,11 +474,21 @@
           nextSplit += split;
           var marker = getPointAtTime(p0, p1, p2, j);
 
-          markers.push(marker);
+          if(singleLine) {
+            markers.push(marker);
+          }
+          else {
+            var m1 = getOffsetPoint(p0, p1, marker, j, trackWidth);
+            var m2 = getOffsetPoint(p0, p1, marker, j, trackWidth * -1);
+
+            markers.push(m1);
+            markers.push(m2);
+          }
         }
 
         if(length >= nextGateSplit) {
           nextGateSplit += gateSplit;
+          var marker = getPointAtTime(p0, p1, p2, j);
           var gate = getGate(p0, p1, p2, marker, j);
 
           gates.push(gate);
@@ -425,24 +546,31 @@
     return (A_32 * Sabc + A_2 * B * (Sabc - C_2) + (4 * C * A - B * B) * Math.log((2 * A_2 + BA + Sabc) / (BA + C_2))) / (4 * A_32);
   }
 
-  function getGate(p0, p1, p2, p, t) {
-    var p11 = new Point(0, 0);
+  function getOffsetPoint(p0, p1, p, t, offset) {
+    var p11 = new Point();
+    var pOff = new Point();
+    var multiplier = (offset < 0) ? -1 : 1;
+    var c = (offset < 0) ? offset * -1 : offset;
 
     p11.x = (1 - t) * p0.x + t * p1.x;
     p11.y = (1 - t) * p0.y + t * p1.y;
 
-    var c = 15;
     var b = Math.sqrt(Math.pow((p.x - p11.x), 2) + Math.pow((p.y - p11.y), 2));
     var alpha = Math.acos((b / c) * Math.PI / 180);
 
-    var l1 = new Point();
-    var l2 = new Point();
+    pOff.x = (p.x) + Math.tan(alpha) * multiplier * Math.PI / 180 * -1 * (p11.y - p.y);
+    pOff.y = (p.y) + Math.tan(alpha) * multiplier * Math.PI / 180 * (p11.x - p.x);
 
-    l1.x = (p.x) + Math.tan(alpha) * Math.PI / 180 * -1 * (p11.y - p.y);
-    l1.y = (p.y) + Math.tan(alpha) * Math.PI / 180 * (p11.x - p.x);
+    return pOff;
+  }
 
-    l2.x = (p.x) + Math.tan(-alpha) * Math.PI / 180 * -1 * (p11.y - p.y);
-    l2.y = (p.y) + Math.tan(-alpha) * Math.PI / 180 * (p11.x - p.x);
+  function getGate(p0, p1, p2, p, t) {
+    var l1 = getOffsetPoint(p0, p1, p, t, 16);
+    var l2 = getOffsetPoint(p0, p1, p, t, -16);
+
+    var p11 = new Point();
+    p11.x = (1 - t) * p0.x + t * p1.x;
+    p11.y = (1 - t) * p0.y + t * p1.y;
 
     var angle = Math.atan2(p11.y - p.y, p11.x - p.x);
 
@@ -452,7 +580,6 @@
     return gate;
   }
 
-  // t 0..1
   function getPointAtTime(p0, p1, p2, t) {
     var x = Math.pow((1 - t), 2) * p0.x + 2 * (1 - t) * t * p1.x + Math.pow(t, 2) * p2.x;
     var y = Math.pow((1 - t), 2) * p0.y + 2 * (1 - t) * t * p1.y + Math.pow(t, 2) * p2.y;
