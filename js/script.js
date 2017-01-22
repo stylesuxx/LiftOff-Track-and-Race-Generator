@@ -63,41 +63,30 @@
     }
   }
 
-  class Bezier {
-    getLength(p0, p1, p2) {
-      var a = new Point();
-      var b = new Point();
-
-      a.x = p0.x + p2.x - 2 * p1.x;
-      a.y = p0.y + p2.y - 2 * p1.y;
-
-      b.x = 2 * p1.x - 2 * p0.x;
-      b.y = 2 * p1.y - 2 * p0.y;
-
-      // if point a is on (0,0) we have a perfect line
-      if(a.x == 0 && a.y == 0) {
-        return this.getLengthLine(p0, p1);
-      }
-
-      var A = 4 * (Math.pow(a.x, 2) + Math.pow(a.y, 2));
-      var B = 4 * (a.x * b.x + a.y * b.y);
-      var C = Math.pow(b.x, 2) + Math.pow(b.y, 2);
-
-      var Sabc = 2 * Math.sqrt(A + Math.abs(B) + C);
-      var A_2 = Math.sqrt(A);
-      var A_32 = 2 * A * A_2;
-      var C_2 = 2 * Math.sqrt(C);
-      var BA = B / A_2;
-
-      return (A_32 * Sabc + A_2 * B * (Sabc - C_2) + (4 * C * A - B * B) * Math.log((2 * A_2 + BA + Sabc) / (BA + C_2))) / (4 * A_32);
-    }
-
+  class Math2D {
     getLengthLine(p0, p1) {
       return Math.sqrt(Math.pow(p1.x - p0.x, 2) + Math.pow(p1.y - p0.y, 2));
     }
 
+    getMidpoint(p0, p1) {
+      var midpoint = new Point();
+      midpoint.x = (p0.x + p1.x) / 2;
+      midpoint.y = (p0.y + p1.y) / 2;
+
+      return midpoint;
+    }
+  }
+
+  class Bezier {
+    constructor() {
+      this.math = new Math2D();
+    }
+
+    getLength(p0, p1, p2) {
+      return this.getLengthAtTime(p0, p1, p2, 1);
+    }
+
     getLengthAtTime(p0, p1, p2, t) {
-      var t = t;
       var a = new Point();
       var b = new Point();
 
@@ -107,12 +96,13 @@
       b.x = 2 * p1.x - 2 * p0.x;
       b.y = 2 * p1.y - 2 * p0.y;
 
+      // Special case when the curve is a line.
       if(a.x == 0 && a.y == 0) {
         b = new Point();
         b.x = (1 - t) * p0.x + t * p2.x;
         b.y = (1 - t) * p0.y + t * p2.y;
 
-        return this.getLengthLine(p0, b);
+        return this.math.getLengthLine(p0, b);
       }
 
       var A = 4 * (Math.pow(a.x, 2) + Math.pow(a.y, 2));
@@ -151,14 +141,6 @@
 
       return new Point(x, y);
     }
-
-    getMidpoint(p0, p1) {
-      var midpoint = new Point();
-      midpoint.x = (p0.x + p1.x) / 2;
-      midpoint.y = (p0.y + p1.y) / 2;
-
-      return midpoint;
-    }
   }
 
   class Track {
@@ -170,6 +152,7 @@
       this.addingPoint = false;
 
       this.bezier = new Bezier();
+      this.math = new Math2D();
 
       this.$blueprintTemplate = $('<TrackBlueprint />', {
         'xsi:type': 'TrackBlueprintFlag'
@@ -280,7 +263,7 @@
           newest.x = event.x;
           newest.y = event.y;
 
-          var midpoint = that.bezier.getMidpoint(last, newest);
+          var midpoint = that.math.getMidpoint(last, newest);
           cp.x = midpoint.x;
           cp.y = midpoint.y;
 
@@ -310,17 +293,15 @@
 
       // Push the start point and add the first Segment
       var start = new Point(20, 20);
-      var first = new Point(200, 200);
+      var first = new Point(200, 300);
       this.points.push(start);
       this.addSegment(first);
       this.draw();
     }
 
     /**
-     * By default a new point is added to the center of the canvas. Adjust the
-     * controll point to be on the center of the line between the previous
-     * and the new point.
-     *
+     * If no point is give a new point is added to the center of the canvas.
+     * The control point is always placed between the new and the last point.
      */
     addSegment(p={}) {
       var x = p.x || this.width / 2;
@@ -328,7 +309,7 @@
 
       var last = this.points[this.points.length - 1];
       var p = new Point(x, y);
-      var cp = this.bezier.getMidpoint(p, last);
+      var cp = this.math.getMidpoint(p, last);
 
       this.points.push(cp);
       this.points.push(p);
@@ -346,7 +327,7 @@
       // Draw all the curve segments in one single path
       this.c.lineWidth = this.style.curve.width;
       this.c.strokeStyle = this.style.curve.color;
-      this.drawCurve();
+      this.drawPath();
 
       this.c.lineWidth = this.style.circles.width;
       this.c.strokeStyle = this.style.circles.color;
@@ -384,29 +365,24 @@
       }
     }
 
-    drawCurve() {
+    drawPath() {
+      var last = this.points[0];
+
       this.c.beginPath();
-      var last = null;
-      for(var i in this.points) {
+      this.c.moveTo(last.x, last.y);
+      for(var i= 1; i < this.points.length; i++) {
         var point = this.points[i];
 
         if(i % 2 == 0) {
-          if(!last) {
-            // Controll Point
-            this.c.moveTo(point.x, point.y );
-          }
-          else {
-            // Draw curve segment
-            this.c.quadraticCurveTo(last.x, last.y, point.x, point.y );
-            this.c.stroke();
-          }
+          this.c.quadraticCurveTo(last.x, last.y, point.x, point.y);
+          this.c.stroke();
         }
 
         last = point;
       }
 
       if(this.close) {
-        this.c.quadraticCurveTo(last.x, last.y, this.points[0].x, this.points[0].y );
+        this.c.quadraticCurveTo(last.x, last.y, this.points[0].x, this.points[0].y);
         this.c.stroke();
       }
     }
@@ -416,7 +392,7 @@
         this.c.beginPath();
         if(i % 2 == 0) {
           this.c.arc(this.points[i].x, this.points[i].y, this.style.point.radius,
-                this.style.point.arc1, this.style.point.arc2, true );
+                     this.style.point.arc1, this.style.point.arc2, true );
         }
         else {
           this.c.arc(this.points[i].x, this.points[i].y,
@@ -433,11 +409,11 @@
       this.c.strokeStyle = this.style.circles.color;
       this.c.fillStyle = this.style.circles.fill;
 
-      for(var i in this.markers) {
+      for(var marker of this.markers) {
         this.c.beginPath();
-        this.c.arc(this.markers[i].x, this.markers[i].y,
-              this.style.smallPoint.radius, this.style.smallPoint.arc1,
-              this.style.point.arc2, true);
+        this.c.arc(marker.x, marker.y,
+                   this.style.smallPoint.radius, this.style.smallPoint.arc1,
+                   this.style.point.arc2, true);
         this.c.fill();
         this.c.stroke();
       }
@@ -450,6 +426,7 @@
 
       for(var gate of this.gates) {
         var gate = gate.line;
+
         this.c.beginPath();
         this.c.moveTo(gate.p0.x, gate.p0.y);
         this.c.lineTo(gate.p1.x, gate.p1.y)
@@ -457,19 +434,15 @@
       }
     }
 
-    placeMarkers(spacing, spacingGates, trackWidth) {
-      var split = spacing;
-      var gateSplit = spacingGates;
-      var trackWidth = trackWidth;
-
+    placeMarkers(split, gateSplit, trackWidth) {
       this.markers = [];
       this.gates = [];
 
       // Get length of all curves
       var totalLength = 0;
       var pointAmount = this.points.length - 1;
-      for(var i = 0; i < pointAmount - 1; i+=2) {
-        totalLength = this.bezier.getLength(this.points[i], this.points[i + 1], this.points[i + 2]);
+      for(var i = 0; i < pointAmount - 2; i += 2) {
+        totalLength += this.bezier.getLength(this.points[i], this.points[i + 1], this.points[i + 2]);
       }
       totalLength += this.bezier.getLength(this.points[pointAmount-1], this.points[pointAmount], this.points[0]);
 
@@ -491,10 +464,15 @@
         var p2 = this.points[(i+2) % this.points.length];
 
         var length;
-        for(var j = 0.0001; j < 1; j += 0.0001) {
+        var hadGateSplit = false;
+        var hadMarkerSplit = false;
+        for(var j = 0.0001; j <= 1; j += 0.0001) {
+          hadGateSplit = false;
+          hadMarkerSplit = false;
           length = this.bezier.getLengthAtTime(p0, p1, p2, j);
 
           if(length >= nextSplit) {
+            hadMarkerSplit = true;
             nextSplit += split;
             var marker = this.bezier.getPointAtTime(p0, p1, p2, j);
 
@@ -511,6 +489,7 @@
           }
 
           if(length >= nextGateSplit) {
+            hadGateSplit = true;
             nextGateSplit += gateSplit;
             var marker = this.bezier.getPointAtTime(p0, p1, p2, j);
             var gate = this.getGate(p0, p1, p2, marker, j);
@@ -519,8 +498,8 @@
           }
         }
 
-        nextSplit -= length;
-        nextGateSplit -= length;
+        if(!hadMarkerSplit) nextSplit -= length;
+        if(!hadGateSplit) nextGateSplit -= length;
       }
     }
 
@@ -533,7 +512,6 @@
       p11.y = (1 - t) * p0.y + t * p1.y;
 
       var angle = Math.atan2(p11.y - p.y, p11.x - p.x);
-
       var line = new Line(l1, l2);
       var gate = new Gate(line, p, angle * 180 / Math.PI );
 
@@ -547,38 +525,36 @@
 
       $trackXML.find('localID str').text(id);
       $trackXML.find('name').text(trackName);
-      $trackXML.find('lastTrackItemID').text(that.markers.length - 1);
+      $trackXML.find('lastTrackItemID').text(this.markers.length - 1);
 
-      setTimeout(function() {
-        $(that.markers).each(function(index, marker) {
-          var p = that.transfromCoords(marker);
-          var $blueprint = that.getBlueprint(index, p, itemName);
-          $trackXML.find('blueprints').append($blueprint);
-        })
-        .promise()
-        .done(function() {
-          if(that.gatesEnabled) {
-            $trackXML.find('lastTrackItemID').text(that.markers.length + that.gates.length - 1);
-            $(that.gates).each(function(index, gate) {
-              var p = that.transfromCoords(gate.center);
-              var $blueprint = that.getBlueprint(index + that.markers.length, p, 'AirgateBigLiftoffDark01', gate.rotation + 90);
-              $trackXML.find('blueprints').append($blueprint);
-            })
-            .promise()
-            .done(function() {
-              var first = that.transfromCoords(that.gates[0].center);
-              var $blueprint = that.getBlueprint(that.markers.length + that.gates.length, first, 'SpawnPointSingle01', that.gates[0].rotation - 90);
-              $trackXML.find('blueprints').append($blueprint);
-              $trackXML.find('lastTrackItemID').text(that.markers.length + that.gates.length);
+      $(this.markers).each(function(index, marker) {
+        var p = that.transfromCoords(marker);
+        var $blueprint = that.getBlueprint(index, p, itemName);
+        $trackXML.find('blueprints').append($blueprint);
+      })
+      .promise()
+      .done(function() {
+        if(that.gatesEnabled) {
+          $trackXML.find('lastTrackItemID').text(that.markers.length + that.gates.length - 1);
+          $(that.gates).each(function(index, gate) {
+            var p = that.transfromCoords(gate.center);
+            var $blueprint = that.getBlueprint(index + that.markers.length, p, 'AirgateBigLiftoffDark01', gate.rotation + 90);
+            $trackXML.find('blueprints').append($blueprint);
+          })
+          .promise()
+          .done(function() {
+            var first = that.transfromCoords(that.gates[0].center);
+            var $blueprint = that.getBlueprint(that.markers.length + that.gates.length, first, 'SpawnPointSingle01', that.gates[0].rotation - 90);
+            $trackXML.find('blueprints').append($blueprint);
+            $trackXML.find('lastTrackItemID').text(that.markers.length + that.gates.length);
 
-              cb(that.sanitizeXML(trackXML));
-            })
-          }
-          else {
-            cb(that.sanitizeXML(trackXML));
-          }
-        });
-      }, 100);
+            if(cb) cb(trackXML);
+          })
+        }
+        else {
+          if(cb) cb(trackXML);
+        }
+      });
     }
 
     transfromCoords(p) {
@@ -601,23 +577,6 @@
       return p;
     }
 
-    sanitizeXML(xml) {
-      // Sanitize the XML, so the game does not comlain
-      var xmlString = (new XMLSerializer()).serializeToString(xml);
-      xmlString = xmlString.replace(/ xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
-      xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
-      xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
-      xmlString = xmlString.replace(/itemid/g, 'itemID');
-      xmlString = xmlString.replace(/instanceid/g, 'instanceID');
-      xmlString = xmlString.replace(/uniqueid/g, 'uniqueId');
-      xmlString = xmlString.replace(/checkpointid/g, 'checkPointID');
-      xmlString = xmlString.replace(/passagetype/g, 'passageType');
-      xmlString = xmlString.replace(/nextpassageids/g, 'nextPassageIDs');
-      xmlString = xmlString.replace(/racecheckpointpassage/g, 'RaceCheckpointPassage');
-
-      return xmlString;
-    }
-
     getBlueprint(id, p0, type, rotation=0) {
       var $blueprint = this.$blueprintTemplate.clone();
 
@@ -633,6 +592,7 @@
 
     generateRace(cb) {
       var that = this;
+      var indexOffset = that.markers.length;
       var $checkpointTemplate = $('<RaceCheckpointPassage />')
       .append($('<uniqueId />'))
       .append($('<checkPointID />'))
@@ -654,54 +614,68 @@
       $raceXML.find('dependencies dependency str').text(id);
       $raceXML.find('spawnPointID').text(spawnPointID);
 
-      var indexOffset = that.markers.length;
-      setTimeout(function() {
+      $(this.gates).each(function(index, gate) {
+        var idx = indexOffset + parseInt(index);
+        var $checkpoint = $checkpointTemplate.clone();
 
-        $(that.gates).each(function(index, gate) {
-          var idx = indexOffset + parseInt(index);
-          var $checkpoint = $checkpointTemplate.clone();
+        $checkpoint.find('checkPointID').text(idx);
+        $checkpoint.find('uniqueId').text(index);
+        $checkpoint.find('passageType').text('Pass');
+        $checkpoint.find('directionality').text('LeftToRight');
+        $checkpoint.find('nextPassageIDs string').text((index + 1));
 
-          $checkpoint.find('checkPointID').text(idx);
-          $checkpoint.find('uniqueId').text(index);
-          $checkpoint.find('passageType').text('Pass');
-          $checkpoint.find('directionality').text('LeftToRight');
-          $checkpoint.find('nextPassageIDs string').text((index + 1));
+        if(index == 0) {
+          $checkpoint.find('nextPassageIDs string').text('Finish');
+        }
 
-          if(index == 0) {
-            $checkpoint.find('nextPassageIDs string').text('Finish');
-          }
+        if(index == 1) {
+          //First gate is start and end gate
+          $checkpoint.find('uniqueId').text('Start');
+          $checkpoint.find('passageType').text('Start');
+          $checkpoint.find('directionality').text('RightToLeft');
 
-          if(index == 1) {
-            //First gate is start and end gate
-            $checkpoint.find('uniqueId').text('Start');
-            $checkpoint.find('passageType').text('Start');
-            $checkpoint.find('directionality').text('RightToLeft');
+          var $finish = $checkpoint.clone();
+          $finish.find('uniqueId').text('Finish');
+          $finish.find('passageType').text('Finish');
+          $finish.find('nextPassageIDs string').remove();
 
-            var $finish = $checkpoint.clone();
-            $finish.find('uniqueId').text('Finish');
-            $finish.find('passageType').text('Finish');
-            $finish.find('nextPassageIDs string').remove();
+          $raceXML.find('checkPointPassages').append($finish);
+        }
 
-            $raceXML.find('checkPointPassages').append($finish);
-          }
+        if(index == that.gates.length - 1) {
+          $checkpoint.find('nextPassageIDs string').text(0);
+        }
 
-          if(index == that.gates.length - 1) {
-            $checkpoint.find('nextPassageIDs string').text(0);
-          }
-
-          $raceXML.find('checkPointPassages').append($checkpoint);
-        })
-        .promise()
-        .done(function() {
-          cb(that.sanitizeXML(raceXML));
-        });
-      }, 100);
+        $raceXML.find('checkPointPassages').append($checkpoint);
+      })
+      .promise()
+      .done(function() {
+        if(cb) cb(raceXML);
+      });
     }
   }
 
   // Register all click handlers
   $(document).ready(function() {
+    function sanitizeXML(xml) {
+      // Sanitize the XML, so the game does not comlain
+      var xmlString = (new XMLSerializer()).serializeToString(xml);
+      xmlString = xmlString.replace(/ xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
+      xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
+      xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
+      xmlString = xmlString.replace(/itemid/g, 'itemID');
+      xmlString = xmlString.replace(/instanceid/g, 'instanceID');
+      xmlString = xmlString.replace(/uniqueid/g, 'uniqueId');
+      xmlString = xmlString.replace(/checkpointid/g, 'checkPointID');
+      xmlString = xmlString.replace(/passagetype/g, 'passageType');
+      xmlString = xmlString.replace(/nextpassageids/g, 'nextPassageIDs');
+      xmlString = xmlString.replace(/racecheckpointpassage/g, 'RaceCheckpointPassage');
+
+      return xmlString;
+    }
+
     function attachXML(xml) {
+      var xml = sanitizeXML(xml);
       $('.rendered-track').remove();
       $('.content > div').append($('<div />', {
         class: 'rendered-track'
@@ -817,7 +791,10 @@
       })
       $('.rendered-track').append($generating);
 
-      track.generate(id, trackName, itemName, attachXML);
+      // Give the DOM some time to update before invoking track generation
+      setTimeout(function() {
+        track.generate(id, trackName, itemName, attachXML);
+      }, 100);
 
       if(track.gatesEnabled) {
         $('.race').removeClass('hidden');
@@ -839,7 +816,10 @@
       })
       $('.rendered-track').append($generating);
 
-      track.generateRace(attachXML);
+      // Give the DOM some time to update...
+      setTimeout(function() {
+        track.generateRace(attachXML);
+      },100);
     });
   });
 
