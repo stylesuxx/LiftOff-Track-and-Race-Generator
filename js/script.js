@@ -472,8 +472,8 @@
     }
 
     getGate(p0, p1, p2, p, t) {
-      var l1 = this.bezier.getOffsetPoint(p0, p1, p, t, 16);
-      var l2 = this.bezier.getOffsetPoint(p0, p1, p, t, -16);
+      var l1 = this.bezier.getOffsetPoint(p0, p1, p, t, 18.5);
+      var l2 = this.bezier.getOffsetPoint(p0, p1, p, t, -18.5);
 
       var p11 = new Point();
       p11.x = (1 - t) * p0.x + t * p1.x;
@@ -728,7 +728,7 @@
     $("#preview").on("click", function() {
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
-      var trackWidth = $('#track-width').val() || 16;
+      var trackWidth = $('#track-width').val() || 18.5;
       id = Math.random().toString(36).substring(7);
 
       track.clear();
