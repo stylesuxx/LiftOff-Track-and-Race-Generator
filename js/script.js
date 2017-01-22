@@ -699,6 +699,19 @@
       }
     });
 
+    $('#undo-close').on('click', function() {
+      if(track.close) {
+        track.close = false;
+        $('.step-1').show();
+        $('#step-2').hide();
+        $('.rendered-track').remove();
+        $('#marker-type option').remove();
+
+        track.points.pop();
+        track.draw();
+      }
+    });
+
     $('#enable-gates').on('change', function() {
       $('.gate-spacing').toggleClass('hidden');
       track.gatesEnabled = !track.gatesEnabled;
