@@ -74,17 +74,26 @@
       b.x = 2 * p1.x - 2 * p0.x;
       b.y = 2 * p1.y - 2 * p0.y;
 
+      // if point a is on (0,0) we have a perfect line
+      if(a.x == 0 && a.y == 0) {
+        return this.getLengthLine(p0, p1);
+      }
+
       var A = 4 * (Math.pow(a.x, 2) + Math.pow(a.y, 2));
       var B = 4 * (a.x * b.x + a.y * b.y);
       var C = Math.pow(b.x, 2) + Math.pow(b.y, 2);
 
-      var Sabc = 2 * Math.sqrt(A + B + C);
+      var Sabc = 2 * Math.sqrt(A + Math.abs(B) + C);
       var A_2 = Math.sqrt(A);
       var A_32 = 2 * A * A_2;
       var C_2 = 2 * Math.sqrt(C);
       var BA = B / A_2;
 
       return (A_32 * Sabc + A_2 * B * (Sabc - C_2) + (4 * C * A - B * B) * Math.log((2 * A_2 + BA + Sabc) / (BA + C_2))) / (4 * A_32);
+    }
+
+    getLengthLine(p0, p1) {
+      return Math.sqrt(Math.pow(p1.x - p0.x, 2) + Math.pow(p1.y - p0.y, 2));
     }
 
     getLengthAtTime(p0, p1, p2, t) {
@@ -97,6 +106,14 @@
 
       b.x = 2 * p1.x - 2 * p0.x;
       b.y = 2 * p1.y - 2 * p0.y;
+
+      if(a.x == 0 && a.y == 0) {
+        b = new Point();
+        b.x = (1 - t) * p0.x + t * p2.x;
+        b.y = (1 - t) * p0.y + t * p2.y;
+
+        return this.getLengthLine(p0, b);
+      }
 
       var A = 4 * (Math.pow(a.x, 2) + Math.pow(a.y, 2));
       var B = 4 * (a.x * b.x + a.y * b.y);
@@ -134,6 +151,14 @@
 
       return new Point(x, y);
     }
+
+    getMidpoint(p0, p1) {
+      var midpoint = new Point();
+      midpoint.x = (p0.x + p1.x) / 2;
+      midpoint.y = (p0.y + p1.y) / 2;
+
+      return midpoint;
+    }
   }
 
   class Track {
@@ -142,6 +167,7 @@
       this.canvas = canvas;
       this.drag = null;
       this.dpoint;
+      this.addingPoint = false;
 
       this.bezier = new Bezier();
 
@@ -216,6 +242,11 @@
       function dragStart(event) {
         event = mousePos(event);
 
+        if(that.addingPoint) {
+          that.addingPoint = false;
+          return;
+        }
+
         for(var p in that.points) {
           var dx = that.points[p].x - event.x;
           var dy = that.points[p].y - event.y;
@@ -236,6 +267,22 @@
           that.points[that.drag].x += event.x - that.dpoint.x;
           that.points[that.drag].y += event.y - that.dpoint.y;
           that.dpoint = event;
+
+          that.draw();
+        }
+
+        if(that.addingPoint) {
+          event = mousePos(event);
+          var newest = that.points[that.points.length - 1];
+          var cp = that.points[that.points.length - 2];
+          var last = that.points[that.points.length - 3];
+
+          newest.x = event.x;
+          newest.y = event.y;
+
+          var midpoint = that.bezier.getMidpoint(last, newest);
+          cp.x = midpoint.x;
+          cp.y = midpoint.y;
 
           that.draw();
         }
@@ -263,22 +310,28 @@
 
       // Push the start point and add the first Segment
       var start = new Point(20, 20);
+      var first = new Point(200, 200);
       this.points.push(start);
-      this.addSegment();
+      this.addSegment(first);
+      this.draw();
     }
 
-    addSegment() {
-      var x = this.width - 20;
-      var y = this.height - 20;
+    /**
+     * By default a new point is added to the center of the canvas. Adjust the
+     * controll point to be on the center of the line between the previous
+     * and the new point.
+     *
+     */
+    addSegment(p={}) {
+      var x = p.x || this.width / 2;
+      var y = p.y || this.height / 2;
 
       var last = this.points[this.points.length - 1];
-      var cp = new Point(x, last.y);
       var p = new Point(x, y);
+      var cp = this.bezier.getMidpoint(p, last);
 
       this.points.push(cp);
       this.points.push(p);
-
-      this.draw();
     }
 
     clear() {
@@ -416,7 +469,7 @@
       var totalLength = 0;
       var pointAmount = this.points.length - 1;
       for(var i = 0; i < pointAmount - 1; i+=2) {
-        totalLength += this.bezier.getLength(this.points[i], this.points[i + 1], this.points[i + 2]);
+        totalLength = this.bezier.getLength(this.points[i], this.points[i + 1], this.points[i + 2]);
       }
       totalLength += this.bezier.getLength(this.points[pointAmount-1], this.points[pointAmount], this.points[0]);
 
@@ -667,8 +720,10 @@
      * New point may be added until the track has been closed
      */
     $('#add-point').on('click', function() {
-      if(!track.close) {
+      if(!track.close && !track.addingPoint) {
+        track.addingPoint = true;
         track.addSegment();
+        track.draw();
       }
     });
 
@@ -732,8 +787,8 @@
       id = Math.random().toString(36).substring(7);
 
       track.clear();
-      track.placeMarkers(markerSpacing, gateSpacing, trackWidth);
       track.drawGrid();
+      track.placeMarkers(markerSpacing, gateSpacing, trackWidth);
       track.drawMarkers();
 
       if(track.gatesEnabled) {
