@@ -679,7 +679,7 @@
     $('#close').on('click', function() {
       if(!track.close) {
         track.close = true;
-        $('#step-1').hide();
+        $('.step-1').hide();
         $('#step-2').show();
 
         for(var marker of markerTypes) {
