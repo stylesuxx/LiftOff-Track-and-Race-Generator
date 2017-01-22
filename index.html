@@ -10,36 +10,45 @@
     <div class="container">
       <div class="main">
         <div class="row header">
+
           <div class="col-md-12">
             <h1>LiftOff Track and Race Generator</h1>
           </div>
+
         </div>
 
         <div class="controlls row">
 
           <div id="step-1" class="col-md-12 form-inline">
             <div class="row">
+
               <div class="col-md-3">
                 <div class="row">
+
                   <div class="col-md-6">
                     <button id="add-point" class="btn btn-default">Add point</button>
                   </div>
+
                   <div class="col-md-6">
                     <button id="close" class="btn btn-default">Close Track</button>
                   </div>
+
                 </div>
               </div>
+
               <div class="col-md-9">
                 <p class="help-block">
                   New points are added to the bottom left. Click <i>Close Track</i> to connect start and end point.<br />
                   Tip: Press <i>STRG</i> and scroll your <i>mouse wheel</i> to make the track editor fit your screen.
                 </p>
               </div>
+
             </div>
           </div>
 
           <div id="step-2"  class="col-md-12 form-inline">
             <div class="row">
+
               <div class='col-md-5'>
 
                 <div class='form-group'>
@@ -76,9 +85,11 @@
                   <label for="track-width">Width:</label>
                   <input name="track-width" id="track-width" type="number" value=16 class='form-control'/>
                 </div>
+
               </div>
 
               <div class='col-md-7'>
+
                 <div class='form-group'>
                   <button id="preview" class="btn btn-default">Preview</button>
                 </div>
@@ -103,23 +114,24 @@
                   Set the space between the markers, the <i>lower</i> the number, the <i>closer together</i> they will be. Press <i>Preview</i> to calculate your settings.
                   After the track has been generated copy the result to a file in a new folder in your track directory. Liftoff reads the tracks on game start, so make sure to do this before starting the game. Same goes for the track.
                 </p>
+
               </div>
             </div>
-
           </div>
-
         </div>
 
         <div class="row content">
+
           <div class="col-md-12">
             <div class="canvas">
               <canvas id='canvas' height="1000" width="600" class="quadratic"></canvas>
             </div>
           </div>
+
         </div>
       </div>
 
-      <div class="footer">
+      <div class="footer row">
         <div class="col-md-12">&copy; <a href="mailto:stylesuxx@gmail.com">stylesuxx</a> 2017</div>
       </div>
     </div>

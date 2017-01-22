@@ -36,6 +36,8 @@ textarea {
   bottom: 0px;
   background: rgba(255, 255, 255, 0.8);right: 50px;
   bottom: 11px;
+
+  z-index: 100;
 }
 
 .content > div {
@@ -91,7 +93,6 @@ label {
 textarea.disabled {
   color: rgba(0, 0, 0, 0.8);
 }
-
 
 .form-group.track-name label {
   padding-left: 10px;
