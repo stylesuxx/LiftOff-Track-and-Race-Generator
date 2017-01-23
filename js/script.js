@@ -366,7 +366,8 @@
     }
 
     drawPath() {
-      var last = this.points[0];
+      var first = this.points[0];
+      var last = first;
 
       this.c.beginPath();
       this.c.moveTo(last.x, last.y);
@@ -382,7 +383,7 @@
       }
 
       if(this.close) {
-        this.c.quadraticCurveTo(last.x, last.y, this.points[0].x, this.points[0].y);
+        this.c.quadraticCurveTo(last.x, last.y, first.x, first.y);
         this.c.stroke();
       }
     }
@@ -441,7 +442,7 @@
       // Get length of all curves
       var totalLength = 0;
       var pointAmount = this.points.length - 1;
-      for(var i = 0; i < pointAmount - 2; i += 2) {
+      for(var i = 0; i < pointAmount - 1; i += 2) {
         totalLength += this.bezier.getLength(this.points[i], this.points[i + 1], this.points[i + 2]);
       }
       totalLength += this.bezier.getLength(this.points[pointAmount-1], this.points[pointAmount], this.points[0]);
@@ -722,8 +723,9 @@
 
         var last = track.points[track.points.length - 1];
         var first = track.points[0];
+        var midpoint = new Math2D().getMidpoint(last, first)
 
-        track.points.push(new Point(last.x, first.y));
+        track.points.push(midpoint);
         track.draw();
       }
     });
