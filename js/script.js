@@ -315,6 +315,13 @@
       this.points.push(p);
     }
 
+    deleteLastSegment() {
+      if(!this.closed && this.points.length > 3) {
+        this.points.pop();
+        this.points.pop();
+      }
+    }
+
     clear() {
       this.c.clearRect(0, 0, this.width, this.height);
     }
@@ -700,6 +707,11 @@
         track.addSegment();
         track.draw();
       }
+    });
+
+    $('#delete-point').on('click', function() {
+      track.deleteLastSegment();
+      track.draw();
     });
 
     /**
