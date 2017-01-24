@@ -8,9 +8,14 @@ var Track = (function() {
   }
 
   class Track {
-    constructor(canvas) {
+    constructor(canvas, xml) {
       var that = this;
+
       this.canvas = canvas;
+      this.xml = xml;
+
+      this.id;
+
       this.drag = null;
       this.dpoint;
       this.addingPoint = false;
@@ -19,27 +24,6 @@ var Track = (function() {
       this.Point = this.m.Point;
       this.Line = this.m.Line;
       this.Bezier = this.m.Bezier;
-
-      this.$blueprintTemplate = $('<TrackBlueprint />', {
-        'xsi:type': 'TrackBlueprintFlag'
-      })
-      .append($('<itemID />'))
-      .append($('<instanceID />'))
-      .append(
-        $('<position />')
-        .append($('<x />'))
-        .append($('<y />'))
-        .append($('<z />'))
-      )
-      .append(
-        $('<rotation />')
-        .append($('<x />', { text: 0.0 }))
-        .append($('<y />', { text: 0.0 }))
-        .append($('<z />', { text: 0.0 }))
-      )
-      .append($('<purpose />', {
-        text: 'Functional'
-      }));
 
       this.style = {
         thinCurve: {
@@ -176,11 +160,11 @@ var Track = (function() {
       var y = p.y || this.height / 2;
 
       var last = this.points[this.points.length - 1];
-      var p = new this.Point(x, y);
-      var line = new this.Line(p, last);
+      var next = new this.Point(x, y);
+      var line = new this.Line(last, next);
 
       this.points.push(line.getMidpoint());
-      this.points.push(p);
+      this.points.push(next);
     }
 
     deleteLastSegment() {
@@ -222,33 +206,28 @@ var Track = (function() {
       this.drawCircles();
     }
 
+    drawLine(p0, p1){
+      this.c.beginPath();
+      this.c.moveTo(p0.x, p0.y);
+      this.c.lineTo(p1.x, p1.y);
+      this.c.stroke();
+    }
+
     drawGrid() {
       this.c.lineWidth = 0.1;
 
       // Horizontal lines
       for(var i = 20; i < this.height; i += 20) {
-        this.c.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-        if(i % 100 == 0) {
-          this.c.strokeStyle = 'rgba(0, 0, 0, 1)';
-        }
+        this.c.strokeStyle = (i % 100 == 0) ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)';
 
-        this.c.beginPath();
-        this.c.moveTo(0, i);
-        this.c.lineTo(this.width, i);
-        this.c.stroke();
+        this.drawLine(new this.Point(0, i), new this.Point(this.width, i));
       }
 
       // Vertical lines
       for(var i = 20; i < this.width; i += 20) {
-        this.c.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-        if(i % 100 == 0) {
-          this.c.strokeStyle = 'rgba(0, 0, 0, 1)';
-        }
+        this.c.strokeStyle = (i % 100 == 0) ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)';
 
-        this.c.beginPath();
-        this.c.moveTo(i, 0);
-        this.c.lineTo(i, this.height);
-        this.c.stroke();
+        this.drawLine(new this.Point(i, 0), new this.Point(i, this.height));
       }
     }
 
@@ -315,10 +294,7 @@ var Track = (function() {
       for(var gate of this.gates) {
         var gate = gate.line;
 
-        this.c.beginPath();
-        this.c.moveTo(gate.p0.x, gate.p0.y);
-        this.c.lineTo(gate.p1.x, gate.p1.y)
-        this.c.stroke();
+        this.drawLine(gate.p0, gate.p1);
       }
     }
 
@@ -410,45 +386,6 @@ var Track = (function() {
       return gate;
     }
 
-    generate(id, trackName, itemName, cb) {
-      var trackXML = $.parseXML('<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment>LiftoffArena</environment><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>').documentElement;
-      var $trackXML = $(trackXML);
-      var that = this;
-
-      $trackXML.find('localID str').text(id);
-      $trackXML.find('name').text(trackName);
-      $trackXML.find('lastTrackItemID').text(this.markers.length - 1);
-
-      $(this.markers).each(function(index, marker) {
-        var p = that.transfromCoords(marker);
-        var $blueprint = that.getBlueprint(index, p, itemName);
-        $trackXML.find('blueprints').append($blueprint);
-      })
-      .promise()
-      .done(function() {
-        if(that.gatesEnabled) {
-          $trackXML.find('lastTrackItemID').text(that.markers.length + that.gates.length - 1);
-          $(that.gates).each(function(index, gate) {
-            var p = that.transfromCoords(gate.center);
-            var $blueprint = that.getBlueprint(index + that.markers.length, p, 'AirgateBigLiftoffDark01', gate.rotation + 90);
-            $trackXML.find('blueprints').append($blueprint);
-          })
-          .promise()
-          .done(function() {
-            var first = that.transfromCoords(that.gates[0].center);
-            var $blueprint = that.getBlueprint(that.markers.length + that.gates.length, first, 'SpawnPointSingle01', that.gates[0].rotation - 90);
-            $trackXML.find('blueprints').append($blueprint);
-            $trackXML.find('lastTrackItemID').text(that.markers.length + that.gates.length);
-
-            if(cb) cb(trackXML);
-          })
-        }
-        else {
-          if(cb) cb(trackXML);
-        }
-      });
-    }
-
     transfromCoords(p) {
       var p = new this.Point(p.x, p.y);
       p.x /= 10;
@@ -469,85 +406,136 @@ var Track = (function() {
       return p;
     }
 
-    getBlueprint(id, p0, type, rotation=0) {
-      var $blueprint = this.$blueprintTemplate.clone();
+    // Return a JSON representation of all Blueprint items
+    getTrackBlueprint(markerType, gateType) {
+      var markerType = markerType || 'DiscConeBlue01';
+      var gateType = gateType || 'AirgateBigLiftoffDark01';
+      var track = [];
 
-      $blueprint.find('itemid').text(type);
-      $blueprint.find('instanceid').text(id);
-      $blueprint.find('position x').text(p0.x);
-      $blueprint.find('position y').text(0.1);
-      $blueprint.find('position z').text(p0.y);
-      $blueprint.find('rotation y').text(rotation);
+      for(var i in this.markers) {
+        var marker = this.markers[i];
+        var p = this.transfromCoords(marker);
 
-      return $blueprint;
+        track.push(this.getBlueprint(i, p, markerType));
+      }
+
+      if(this.gatesEnabled) {
+        for(var i in this.gates) {
+          var gate = this.gates[i];
+          var idx = parseInt(i) + this.markers.length;
+          var p = this.transfromCoords(gate.center);
+
+          track.push(this.getBlueprint(idx, p, gateType, gate.rotation + 90));
+        }
+
+        // Add the spawn point
+        var idx = this.markers.length + this.gates.length;
+        var first = this.transfromCoords(this.gates[0].center);
+        var spawn = this.getBlueprint(idx, first, 'SpawnPointSingle01', this.gates[0].rotation - 90);
+        track.push(spawn);
+      }
+
+      return track;
     }
 
-    generateRace(id, cb) {
-      var that = this;
-      var indexOffset = that.markers.length;
-      var $checkpointTemplate = $('<RaceCheckpointPassage />')
-      .append($('<uniqueId />'))
-      .append($('<checkPointID />'))
-      .append($('<passageType />'))
-      .append($('<directionality />'))
-      .append(
-        $('<nextPassageIDs />')
-        .append($('<string />'))
-      );
+    getBlueprint(id, p, type, rotation=0) {
+      var blueprint = {
+        'itemID': type,
+        'instanceID': id,
+        'position': {
+          'x': p.x,
+          'y': 0.1,
+          'z': p.y
+        },
+        'rotation': {
+          'x': 0,
+          'y': rotation,
+          'z': 0
+        },
+        'purpose': 'Functional'
+      };
 
-      var raceId = Math.random().toString(36).substring(7);
-      var raceXML = $.parseXML('<?xml version="1.0" encoding="utf-16"?><Race xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.2</gameVersion><localID><str /><version>1</version><type>RACE</type></localID><name /><description /><dependencies><dependency><str /><version>1</version><type>TRACK</type></dependency></dependencies><checkPointPassages /><requiredLaps>3</requiredLaps><spawnPointID>-1</spawnPointID><validity>Valid</validity></Race>').documentElement;
-      var $raceXML = $(raceXML);
-      var raceName = $('#race-name').val() || 'Edgy no name race';
-      var spawnPointID = that.markers.length + that.gates.length;
+      return blueprint;
+    }
 
-      $raceXML.find('localID str').text(raceId);
-      $raceXML.find('name').text(raceName);
-      $raceXML.find('dependencies dependency str').text(id);
-      $raceXML.find('spawnPointID').text(spawnPointID);
+    // Return a XML representation of the track, ready to print
+    getTrackXML(trackName, markerType, gateType) {
+      var trackXML = '<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment>LiftoffArena</environment><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>';
+      var blueprints = this.getTrackBlueprint(markerType, gateType);
+      var track = this.xml.xml_str2json(trackXML);
+      var lastId = blueprints.length - 1;
 
-      $(this.gates).each(function(index, gate) {
-        var idx = indexOffset + parseInt(index);
-        var $checkpoint = $checkpointTemplate.clone();
+      track['Track']['localID']['str'] = this.id;
+      track['Track']['name'] = trackName;
+      track['Track']['lastTrackItemID'] = lastId;
+      track['Track']['blueprints'] = { 'TrackBlueprint': [] };
 
-        $checkpoint.find('checkPointID').text(idx);
-        $checkpoint.find('uniqueId').text(index);
-        $checkpoint.find('passageType').text('Pass');
-        $checkpoint.find('directionality').text('LeftToRight');
-        $checkpoint.find('nextPassageIDs string').text((index + 1));
+      for(var blueprint of blueprints) {
+        blueprint['_xsi:type'] = 'TrackBlueprintFlag';
 
-        if(index == 0) {
-          $checkpoint.find('nextPassageIDs string').text('Finish');
+        track['Track']['blueprints']['TrackBlueprint'].push(blueprint);
+      }
+
+      return this.xml.json2xml_str(track);
+    }
+
+    getCheckpoint(uuid, checkPointId, type, direction, next) {
+      var checkpoint = {
+        'uniqueId': uuid,
+        'checkPointID': checkPointId,
+        'passageType': type,
+        'directionality': direction,
+        'nextPassageIDs': {
+          'string': next
+        }
+      };
+
+      return checkpoint;
+    }
+
+    getRaceXML(id, raceName) {
+      var raceXML = '<?xml version="1.0" encoding="utf-16"?><Race xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.2</gameVersion><localID><str /><version>1</version><type>RACE</type></localID><name /><description /><dependencies><dependency><str /><version>1</version><type>TRACK</type></dependency></dependencies><checkPointPassages /><requiredLaps>3</requiredLaps><spawnPointID>-1</spawnPointID><validity>Valid</validity></Race>';
+      var race = this.xml.xml_str2json(raceXML);
+      var indexOffset = this.markers.length;
+      var spawnPointID = this.markers.length + this.gates.length;
+
+      // check if we need race ID
+      race['Race']['localID']['str'] = id;
+      race['Race']['name'] = raceName;
+      race['Race']['dependencies']['dependency']['str'] = this.id;
+      race['Race']['spawnPointID'] = spawnPointID;
+      race['Race']['checkPointPassages'] = { 'RaceCheckpointPassage': [] };
+
+      // Append gates
+      for(var i in this.gates) {
+        var i = parseInt(i);
+        var gate = this.gates[i];
+        var index = i + indexOffset;
+        var checkpoint = this.getCheckpoint(i, index, 'Pass', 'LeftToRight', i + 1);
+
+        if(i == 0) {
+          checkpoint = this.getCheckpoint(i, index, 'Pass', 'LeftToRight', 'Finish');
         }
 
-        if(index == 1) {
-          //First gate is start and end gate
-          $checkpoint.find('uniqueId').text('Start');
-          $checkpoint.find('passageType').text('Start');
-          $checkpoint.find('directionality').text('RightToLeft');
+        if(i == 1) {
+          checkpoint = this.getCheckpoint('Start', index, 'Start', 'RightToLeft', i + 1);
 
-          var $finish = $checkpoint.clone();
-          $finish.find('uniqueId').text('Finish');
-          $finish.find('passageType').text('Finish');
-          $finish.find('nextPassageIDs string').remove();
+          var finish = this.getCheckpoint('Finish', index, 'Finish', 'RightToLeft', i + 1);;
+          delete race['Race']['nextPassageIDs'];
 
-          $raceXML.find('checkPointPassages').append($finish);
+          race['Race']['checkPointPassages']['RaceCheckpointPassage'].push(finish);
         }
 
-        if(index == that.gates.length - 1) {
-          $checkpoint.find('nextPassageIDs string').text(0);
+        if(i == this.gates.length - 1) {
+          checkpoint = this.getCheckpoint(i, index, 'Pass', 'LeftToRight', 0);
         }
 
-        $raceXML.find('checkPointPassages').append($checkpoint);
-      })
-      .promise()
-      .done(function() {
-        if(cb) cb(raceXML);
-      });
+        race['Race']['checkPointPassages']['RaceCheckpointPassage'].push(checkpoint);
+      }
+
+      return this.xml.json2xml_str(race);
     }
   }
 
-  return {
-    Track: Track
-  };
+  return { Track: Track };
 })();

@@ -1,6 +1,5 @@
 (function() {
   var track;
-  var id;
 
   var markerTypes = [
     {
@@ -43,30 +42,12 @@
 
   // Register all click handlers
   $(document).ready(function() {
-    function sanitizeXML(xml) {
-      // Sanitize the XML, so the game does not comlain
-      var xmlString = (new XMLSerializer()).serializeToString(xml);
-      xmlString = xmlString.replace(/ xmlns="http:\/\/www.w3.org\/1999\/xhtml\"/g, '');
-      xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
-      xmlString = xmlString.replace(/trackblueprint/g, 'TrackBlueprint');
-      xmlString = xmlString.replace(/itemid/g, 'itemID');
-      xmlString = xmlString.replace(/instanceid/g, 'instanceID');
-      xmlString = xmlString.replace(/uniqueid/g, 'uniqueId');
-      xmlString = xmlString.replace(/checkpointid/g, 'checkPointID');
-      xmlString = xmlString.replace(/passagetype/g, 'passageType');
-      xmlString = xmlString.replace(/nextpassageids/g, 'nextPassageIDs');
-      xmlString = xmlString.replace(/racecheckpointpassage/g, 'RaceCheckpointPassage');
-
-      return xmlString;
-    }
-
     function attachXML(xml) {
-      var xml = sanitizeXML(xml);
       $('.rendered-track').remove();
-      $('.content > div').append($('<div />', {
-        class: 'rendered-track'
-      })
-        .append($('<textarea />', {
+      $('.content > div').append(
+        $('<div />', {
+          class: 'rendered-track'
+        }).append($('<textarea />', {
           text: xml,
           autocomplete: 'off',
           autocorrect: 'off',
@@ -74,6 +55,15 @@
           spellcheck: 'false'
         }).format({method: 'xml'}))
       );
+    }
+
+    function generateUUID() {
+      var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+
+      return uuid;
     }
 
     /**
@@ -146,7 +136,7 @@
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
       var trackWidth = $('#track-width').val() || 18.5;
-      id = Math.random().toString(36).substring(7);
+      track.id = generateUUID();
 
       track.clear();
       track.drawGrid();
@@ -172,7 +162,7 @@
      */
     $('#generate').on('click', function() {
       var trackName = $('#track-name').val() || 'Edgy no name track';
-      var itemName = $('#marker-type').val() || 'DiscConeBlue01';
+      var markerType = $('#marker-type').val() || 'DiscConeBlue01';
       var $generating = $('<div />', {
         class: 'generating',
         text: 'Generating Track - this may take some time...'
@@ -181,7 +171,8 @@
 
       // Give the DOM some time to update before invoking track generation
       setTimeout(function() {
-        track.generate(id, trackName, itemName, attachXML);
+        var xml = track.getTrackXML(trackName, markerType, 'AirgateBigLiftoffDark01');
+        attachXML(xml);
       }, 100);
 
       if(track.gatesEnabled) {
@@ -198,6 +189,7 @@
      * the second gate. Start and finish are both the second gate.
      */
     $('#generate-race').on('click', function() {
+      var raceName = $('#race-name').val() || 'Edgy no name race';
       var $generating = $('<div />', {
         class: 'generating',
         text: 'Generating Race - this may take some time...'
@@ -206,14 +198,16 @@
 
       // Give the DOM some time to update...
       setTimeout(function() {
-        track.generateRace(id, attachXML);
+        var xml = track.getRaceXML(generateUUID(), raceName);
+        attachXML(xml);
       },100);
     });
   });
 
   var canvas = document.getElementById('canvas');
   if(canvas.getContext) {
-    track = new Track.Track(canvas);
+    var xml = new X2JS();
+    track = new Track.Track(canvas, xml);
   }
   else {
     $('.header').append($('<div />', {
