@@ -74,7 +74,7 @@ var Math2D = (function() {
       return (Math.sqrt(A) / 2) * ((u * Math.sqrt(Math.pow(u, 2) + k) - b * Math.sqrt(Math.pow(b, 2) + k) + k * Math.log(Math.abs( (u + Math.sqrt(Math.pow(u, 2) + k)) / (b + Math.sqrt(Math.pow(b, 2) + k)) )) ));
     }
 
-    // TODO: we can calculate p here....
+    // Return a Point at the given time, with the given offset
     getOffsetPoint(t, offset) {
       var p = this.getPoint(t);
       var p11 = new Point();
