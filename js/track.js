@@ -13,6 +13,7 @@ var Track = (function() {
       this.xml = xml;
 
       this.id;
+      this.raceId;
 
       this.zOffset = 0;
 
@@ -113,7 +114,7 @@ var Track = (function() {
           newest.x = event.x;
           newest.y = event.y;
 
-          var line = new that.m.Line(last, newest);
+          var line = new this.m.Line(last, newest);
           var midpoint = line.getMidpoint();
 
           cp.x = midpoint.x;

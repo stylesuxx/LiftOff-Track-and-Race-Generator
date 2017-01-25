@@ -79,9 +79,7 @@
       return uuid;
     }
 
-    /**
-     * New point may be added until the track has been closed
-     */
+    // Add a new segment
     $('#add-point').on('click', function() {
       if(!track.close && !track.addingPoint) {
         track.addingPoint = true;
@@ -90,6 +88,7 @@
       }
     });
 
+    // Remove the last segment
     $('#delete-point').on('click', function() {
       track.deleteLastSegment();
       track.draw();
@@ -119,6 +118,7 @@
       }
     });
 
+    // Remove the connection between first and last node, return back to Step 1
     $('#undo-close').on('click', function() {
       if(track.close) {
         track.close = false;
@@ -132,19 +132,19 @@
       }
     });
 
+    // Toggle gates on/off
     $('#enable-gates').on('change', function() {
       $('.gate-spacing').toggleClass('hidden');
       track.gatesEnabled = !track.gatesEnabled;
     });
 
+    // Toggle between single line in the middle or two lines with an offset
     $('#single').on('change', function() {
       $('.track-width').toggleClass('hidden');
       track.singleLine = !track.singleLine;
     });
 
-    /**
-     * Draw preview of the track, enable the generate button
-     */
+    // Draw preview of the track, enable the generate button
     $("#preview").on("click", function() {
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
@@ -172,9 +172,6 @@
      * Canvas has (0, 0) at the top left and (n, m) in the bottom right
      * Liftoff has (0, 0) in the center, (-n, m) top left, (n, m) top right,
      * (-n, -m) bottom left, (n, -m) bottom right.
-     *
-     * Also JS is case insensitive and does some wired stuff when working with
-     * XML, we do also take care of this here.
      */
     $('#generate').on('click', function() {
       var map = $('#map-name').val() || 'LiftoffArena';
@@ -222,6 +219,10 @@
       },100);
     });
 
+    /**
+     * Download a zip of track and race, ready to be extracted to the LiftOff
+     * directory.
+     */
     $('#download-zip').on('click', function() {
       var zip = new JSZip();
       var map = $('#map-name').val() || 'LiftoffArena';
