@@ -186,7 +186,7 @@ var Track = (function() {
     drawGrid() {
       var stroke;
       for(var i = 20; i < this.height; i += 20) {
-        stroke = (i % 100 == 0) ? this.style.grid.strokeThick : this.style.grid.strokeThick;
+        stroke = (i % 100 == 0) ? this.style.grid.strokeThick : this.style.grid.strokeThin;
 
         this.drawLine(new this.Point(0, i), new this.Point(this.width, i), {
           width: this.style.grid.width,
@@ -197,7 +197,7 @@ var Track = (function() {
 
       // Vertical lines
       for(var i = 20; i < this.width; i += 20) {
-        stroke = (i % 100 == 0) ? this.style.grid.strokeThick : this.style.grid.strokeThick;
+        stroke = (i % 100 == 0) ? this.style.grid.strokeThick : this.style.grid.strokeThin;
 
         this.drawLine(new this.Point(i, 0), new this.Point(i, this.height), {
           width: this.style.grid.width,
