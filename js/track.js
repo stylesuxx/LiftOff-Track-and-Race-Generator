@@ -9,8 +9,6 @@ var Track = (function() {
 
   class Track {
     constructor(canvas, xml) {
-      var that = this;
-
       this.canvas = canvas;
       this.xml = xml;
 
@@ -74,43 +72,43 @@ var Track = (function() {
       this.c.lineJoin = 'round';
 
       // Mouse handlers
-      function dragStart(event) {
+      var dragStart = function(event) {
         event = mousePos(event);
 
-        if(that.addingPoint) {
-          that.addingPoint = false;
+        if(this.addingPoint) {
+          this.addingPoint = false;
           return;
         }
 
-        for(var p in that.points) {
-          var dx = that.points[p].x - event.x;
-          var dy = that.points[p].y - event.y;
+        for(var p in this.points) {
+          var dx = this.points[p].x - event.x;
+          var dy = this.points[p].y - event.y;
 
-          if((dx * dx) + (dy * dy) < that.style.point.radius * that.style.point.radius) {
-            that.drag = p;
-            that.dpoint = event;
-            that.canvas.style.cursor = 'move';
+          if((dx * dx) + (dy * dy) < this.style.point.radius * this.style.point.radius) {
+            this.drag = p;
+            this.dpoint = event;
+            this.canvas.style.cursor = 'move';
             return;
           }
         }
-      }
+      }.bind(this);
 
-      function dragging(event) {
-        if(that.drag) {
+      var dragging = function (event) {
+        if(this.drag) {
           event = mousePos(event);
 
-          that.points[that.drag].x += event.x - that.dpoint.x;
-          that.points[that.drag].y += event.y - that.dpoint.y;
-          that.dpoint = event;
+          this.points[this.drag].x += event.x - this.dpoint.x;
+          this.points[this.drag].y += event.y - this.dpoint.y;
+          this.dpoint = event;
 
-          that.draw();
+          this.draw();
         }
 
-        if(that.addingPoint) {
+        if(this.addingPoint) {
           event = mousePos(event);
-          var newest = that.points[that.points.length - 1];
-          var cp = that.points[that.points.length - 2];
-          var last = that.points[that.points.length - 3];
+          var newest = this.points[this.points.length - 1];
+          var cp = this.points[this.points.length - 2];
+          var last = this.points[this.points.length - 3];
 
           newest.x = event.x;
           newest.y = event.y;
@@ -121,25 +119,25 @@ var Track = (function() {
           cp.x = midpoint.x;
           cp.y = midpoint.y;
 
-          that.draw();
+          this.draw();
         }
-      }
+      }.bind(this);
 
-      function dragStop(event) {
-        that.drag = null;
-        that.canvas.style.cursor = 'default';
+      var dragStop = function(event) {
+        this.drag = null;
+        this.canvas.style.cursor = 'default';
 
-        that.draw();
-      }
+        this.draw();
+      }.bind(this);
 
-      function mousePos(event) {
+      var mousePos = function(event) {
         var event = (event ) ? event : window.event;
 
         return {
-          x: event.pageX - $(that.canvas).offset().left,
-          y: event.pageY - $(that.canvas).offset().top
+          x: event.pageX - $(this.canvas).offset().left,
+          y: event.pageY - $(this.canvas).offset().top
         }
-      }
+      }.bind(this);
 
       this.canvas.onmousedown = dragStart;
       this.canvas.onmousemove = dragging;
