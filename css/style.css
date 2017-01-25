@@ -11,6 +11,8 @@ canvas {
   background:#f7f7f7;
   width: 600px;
   height: 1000px;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #step-2 {
@@ -121,4 +123,12 @@ textarea.disabled {
   right: 15px;
   margin-top: -32px;
   z-index: 100;
+}
+
+#background-image {
+  opacity: 0.5;
+}
+
+#background-image:hover {
+  opacity: 1;
 }

@@ -144,7 +144,24 @@
 
             <button class="btn btn-success hidden" id="download-zip" title="Extract to the root of your LiftOff directory. Eg.: .steam/steam/steamapps/common/Liftoff">Download ZIP</button>
             <div class="canvas">
+
               <canvas id='canvas' height="1000" width="600" class="quadratic"></canvas>
+
+              <div class='form-inline'>
+                <div class='form-group'>
+                  <button id="background-image" class="btn btn-info" title="Set a background image for the canvas from an URL.">Image</button>
+                </div>
+                <div class='form-group'>
+                  <input name='track-name' id='background-image-url' type='text' value='Paste Image URL' class='hidden form-control' />
+                </div>
+                <div class='form-group'>
+                  <button id="background-image-set" class="hidden btn btn-default">Set</button>
+                </div>
+                <div class='form-group'>
+                  <button id="background-image-unset" class="hidden btn btn-default">Unset</button>
+                </div>
+              </div>
+
             </div>
 
             <div class="step-1 info-text">

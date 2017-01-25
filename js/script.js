@@ -89,6 +89,7 @@
 
     // Add a new segment
     $('#add-point').on('click', function() {
+      $('#background-image').hide();
       track.addSegment();
     });
 
@@ -225,6 +226,25 @@
       }, 100);
 
     })
+
+    $('#background-image').on('click', function() {
+      $('#background-image-url, #background-image-set, #background-image-unset').toggleClass('hidden');
+    });
+
+    $('#background-image-set').on('click', function() {
+      var url = $('#background-image-url').val();
+      $('canvas').css({
+        'background': 'url(' + url + ')',
+        'background-position': 'center',
+        'background-repeat': 'no-repeat'
+      });
+    });
+
+    $('#background-image-unset').on('click', function() {
+      $('canvas').css({
+        'background': '#f7f7f7'
+      });
+    });
 
     // Add the tracks as options to Step 1
     $(maps).each(function(index, item) {
