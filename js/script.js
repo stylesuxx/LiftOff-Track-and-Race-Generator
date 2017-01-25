@@ -79,19 +79,22 @@
       return uuid;
     }
 
+    function generating(text) {
+      var $generating = $('<div />', {
+        class: 'generating',
+        text: text
+      })
+      $('.rendered-track').append($generating);
+    }
+
     // Add a new segment
     $('#add-point').on('click', function() {
-      if(!track.close && !track.addingPoint) {
-        track.addingPoint = true;
-        track.addSegment();
-        track.draw();
-      }
+      track.addSegment();
     });
 
     // Remove the last segment
     $('#delete-point').on('click', function() {
       track.deleteLastSegment();
-      track.draw();
     });
 
     /**
@@ -99,37 +102,29 @@
      * Attach options for marker selection.
      */
     $('#close').on('click', function() {
-      if(!track.close) {
-        track.close = true;
-        $('.step-1').hide();
-        $('#step-2').show();
+      $('.step-1').hide();
+      $('#step-2').show();
 
-        for(var marker of markerTypes) {
-          var $option = $('<option />', {
-            text: marker.display,
-            value: marker.name
-          });
+      for(var marker of markerTypes) {
+        var $option = $('<option />', {
+          text: marker.display,
+          value: marker.name
+        });
 
-          $('#marker-type').append($option);
-        }
-
-        track.closePath();
-        track.draw();
+        $('#marker-type').append($option);
       }
+
+      track.close();
     });
 
     // Remove the connection between first and last node, return back to Step 1
     $('#undo-close').on('click', function() {
-      if(track.close) {
-        track.close = false;
-        $('.step-1').show();
-        $('#step-2, #download-zip').hide();
-        $('.rendered-track').remove();
-        $('#marker-type option').remove();
+      $('#step-2, #download-zip').hide();
+      $('#marker-type option').remove();
+      $('.rendered-track').remove();
+      $('.step-1').show();
 
-        track.openPath();
-        track.draw();
-      }
+      track.open();
     });
 
     // Toggle gates on/off
@@ -150,18 +145,10 @@
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
       var trackWidth = $('#track-width').val() || 18.5;
 
-      // Generate and set track and race ID
       track.id = generateUUID();
       track.raceId = generateUUID();
 
-      track.clear();
-      track.drawGrid();
-      track.placeMarkers(markerSpacing, gateSpacing, trackWidth);
-      track.drawMarkers();
-
-      if(track.gatesEnabled) {
-        track.drawGates();
-      }
+      track.preview(markerSpacing, gateSpacing, trackWidth)
 
       $('.generate-button, #download-zip').removeClass('hidden');
     });
@@ -178,25 +165,17 @@
       var zOffset = $('#map-name option[value=' + map + ']').attr('z') || 0.0;
       var trackName = $('#track-name').val() || 'Edgy no name track';
       var markerType = $('#marker-type').val() || 'DiscConeBlue01';
-      var $generating = $('<div />', {
-        class: 'generating',
-        text: 'Generating Track - this may take some time...'
-      })
-      $('.rendered-track').append($generating);
 
       // Give the DOM some time to update before invoking track generation
+      generating('Generating Track - this may take some time...');
       setTimeout(function() {
-        track.zOffset = zOffset;
-        var xml = track.getTrackXML(trackName, map, markerType, 'AirgateBigLiftoffDark01');
+        var xml = track.getTrackXML(trackName, map, zOffset, markerType, 'AirgateBigLiftoffDark01');
         attachXML(xml);
-      }, 100);
 
-      if(track.gatesEnabled) {
-        $('.race').removeClass('hidden');
-      }
-      else {
-        $('.race').addClass('hidden');
-      }
+        track.gatesEnabled ?
+          $('.race').removeClass('hidden') :
+          $('.race').addClass('hidden');
+      }, 100);
     });
 
     /**
@@ -206,13 +185,9 @@
      */
     $('#generate-race').on('click', function() {
       var raceName = $('#race-name').val() || 'Edgy no name race';
-      var $generating = $('<div />', {
-        class: 'generating',
-        text: 'Generating Race - this may take some time...'
-      })
-      $('.rendered-track').append($generating);
 
       // Give the DOM some time to update...
+      generating('Generating Race - this may take some time...');
       setTimeout(function() {
         var xml = track.getRaceXML(raceName);
         attachXML(xml);
@@ -229,15 +204,10 @@
       var zOffset = $('#map-name option[value=' + map + ']').attr('z') || 0.0;
       var trackName = $('#track-name').val() || 'Edgy no name track';
       var markerType = $('#marker-type').val() || 'DiscConeBlue01';
-      var $generating = $('<div />', {
-        class: 'generating',
-        text: 'Generating Zip file - this may take some time...'
-      })
-      $('.rendered-track').append($generating);
 
+      generating('Generating Zip file - this may take some time...');
       setTimeout(function() {
-        track.zOffset = zOffset;
-        var trackXML = track.getTrackXML(trackName, map, markerType, 'AirgateBigLiftoffDark01');
+        var trackXML = track.getTrackXML(trackName, map, zOffset, markerType, 'AirgateBigLiftoffDark01');
         zip.file('Liftoff_Data/Tracks/' + track.id + '/' + track.id + '.track', trackXML);
 
         if(track.gatesEnabled) {

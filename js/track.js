@@ -1,48 +1,40 @@
 var Track = (function() {
-  class Gate {
-    constructor(line, center, rotation=0) {
-      this.line = line;
-      this.center = center
-      this.rotation = rotation;
-    }
-  }
-
-  class Track {
-    constructor(canvas, xml) {
+  class Canvas {
+    constructor(canvas) {
       this.canvas = canvas;
-      this.xml = xml;
 
-      this.id;
-      this.raceId;
+      this.height = canvas.height;
+      this.width = canvas.width;
 
-      this.zOffset = 0;
+      this.c = this.canvas.getContext('2d');
+      this.c.lineCap = 'round';
+      this.c.lineJoin = 'round';
 
       this.drag = null;
-      this.dpoint;
-      this.addingPoint = false;
+      this.dpoint = null;
+      this.close = false;
+      this.addingNode = false;
 
       this.m = Math2D;
+      this.Bezier = this.m.Bezier;
       this.Point = this.m.Point;
       this.Line = this.m.Line;
-      this.Bezier = this.m.Bezier;
 
+      this.nodes = [];
       this.style = {
-        thinCurve: {
-          width: 1,
-          color: 'rgba(0, 255, 0, 1)'
-        },
-        curve: {
+        path: {
           width: 6,
-          color: 'hsla(216, 91%, 50%, 0.95)'
+          stroke: 'hsla(216, 91%, 50%, 0.95)'
         },
-        pline: {
+        nodes: {
           width: 2,
-          color: ''
-        },
-        circles: {
-          width: 2,
-          color: '#000',
+          stroke: '#000',
           fill: 'hsla(100, 93%, 50%, 1)'
+        },
+        grid: {
+          width: 0.1,
+          strokeThick: 'rgba(0, 0, 0, 1)',
+          strokeThin: 'rgba(0, 0, 0, 0.4)'
         },
         point: {
           radius: 12,
@@ -56,34 +48,17 @@ var Track = (function() {
         }
       };
 
-      this.markers = [];
-      this.gates = [];
-      this.points = [];
-
-      this.close = false;
-      this.gatesEnabled = false;
-      this.singleLine = true;
-
-      this.c = canvas.getContext('2d');
-      this.width = canvas.width;
-      this.height = canvas.height;
-
-      // line style
-      this.c.lineCap = 'round';
-      this.c.lineJoin = 'round';
-
-      // Mouse handlers
       var dragStart = function(event) {
         event = mousePos(event);
 
-        if(this.addingPoint) {
-          this.addingPoint = false;
+        if(this.addingNode) {
+          this.addingNode = false;
           return;
         }
 
-        for(var p in this.points) {
-          var dx = this.points[p].x - event.x;
-          var dy = this.points[p].y - event.y;
+        for(var p in this.nodes) {
+          var dx = this.nodes[p].x - event.x;
+          var dy = this.nodes[p].y - event.y;
 
           if((dx * dx) + (dy * dy) < this.style.point.radius * this.style.point.radius) {
             this.drag = p;
@@ -98,18 +73,18 @@ var Track = (function() {
         if(this.drag) {
           event = mousePos(event);
 
-          this.points[this.drag].x += event.x - this.dpoint.x;
-          this.points[this.drag].y += event.y - this.dpoint.y;
+          this.nodes[this.drag].x += event.x - this.dpoint.x;
+          this.nodes[this.drag].y += event.y - this.dpoint.y;
           this.dpoint = event;
 
           this.draw();
         }
 
-        if(this.addingPoint) {
+        if(this.addingNode) {
           event = mousePos(event);
-          var newest = this.points[this.points.length - 1];
-          var cp = this.points[this.points.length - 2];
-          var last = this.points[this.points.length - 3];
+          var newest = this.nodes[this.nodes.length - 1];
+          var cp = this.nodes[this.nodes.length - 2];
+          var last = this.nodes[this.nodes.length - 3];
 
           newest.x = event.x;
           newest.y = event.y;
@@ -143,48 +118,40 @@ var Track = (function() {
       this.canvas.onmousedown = dragStart;
       this.canvas.onmousemove = dragging;
       this.canvas.onmouseup = canvas.onmouseout = dragStop;
-
-      // Push the start point and add the first Segment
-      var start = new this.Point(20, 20);
-      var first = new this.Point(200, 300);
-      this.points.push(start);
-      this.addSegment(first);
-      this.draw();
     }
 
-    /**
-     * If no point is give a new point is added to the center of the canvas.
-     * The control point is always placed between the new and the last point.
-     */
-    addSegment(p={}) {
+    addNode(p={}) {
+      this.addingNode = true;
       var x = p.x || this.width / 2;
       var y = p.y || this.height / 2;
 
-      var last = this.points[this.points.length - 1];
+      var last = this.nodes[this.nodes.length - 1];
       var next = new this.Point(x, y);
       var line = new this.Line(last, next);
 
-      this.points.push(line.getMidpoint());
-      this.points.push(next);
+      this.nodes.push(line.getMidpoint());
+      this.nodes.push(next);
     }
 
-    deleteLastSegment() {
-      if(!this.closed && this.points.length > 3) {
-        this.points.pop();
-        this.points.pop();
+    deleteLastNode() {
+      if(!this.closed && this.nodes.length > 3) {
+        this.nodes.pop();
+        this.nodes.pop();
       }
     }
 
     closePath() {
-      var last = this.points[this.points.length - 1];
-      var first = this.points[0];
+      this.close = true;
+      var last = this.nodes[this.nodes.length - 1];
+      var first = this.nodes[0];
       var line = new this.Line(last, first);
 
-      this.points.push(line.getMidpoint());
+      this.nodes.push(line.getMidpoint());
     }
 
     openPath() {
-      this.points.pop();
+      this.nodes.pop();
+      this.close = false;
     }
 
     clear() {
@@ -193,21 +160,23 @@ var Track = (function() {
 
     draw() {
       this.clear();
-
       this.drawGrid();
 
-      // Draw all the curve segments in one single path
-      this.c.lineWidth = this.style.curve.width;
-      this.c.strokeStyle = this.style.curve.color;
+      this.c.strokeStyle = this.style.path.stroke;
+      this.c.lineWidth = this.style.path.width;
       this.drawPath();
 
-      this.c.lineWidth = this.style.circles.width;
-      this.c.strokeStyle = this.style.circles.color;
-      this.c.fillStyle = this.style.circles.fill;
-      this.drawCircles();
+      this.c.strokeStyle = this.style.nodes.stroke;
+      this.c.lineWidth = this.style.nodes.width;
+      this.c.fillStyle = this.style.nodes.fill;
+      this.drawNodes();
     }
 
-    drawLine(p0, p1){
+    drawLine(p0, p1, style) {
+      this.c.lineWidth = style.width;
+      this.c.strokeStyle = style.stroke;
+      this.c.fillStyle = style.fill;
+
       this.c.beginPath();
       this.c.moveTo(p0.x, p0.y);
       this.c.lineTo(p1.x, p1.y);
@@ -215,38 +184,44 @@ var Track = (function() {
     }
 
     drawGrid() {
-      this.c.lineWidth = 0.1;
-
-      // Horizontal lines
+      var stroke;
       for(var i = 20; i < this.height; i += 20) {
-        this.c.strokeStyle = (i % 100 == 0) ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)';
+        stroke = (i % 100 == 0) ? this.style.grid.strokeThick : this.style.grid.strokeThick;
 
-        this.drawLine(new this.Point(0, i), new this.Point(this.width, i));
+        this.drawLine(new this.Point(0, i), new this.Point(this.width, i), {
+          width: this.style.grid.width,
+          stroke: stroke,
+          fill: null
+        });
       }
 
       // Vertical lines
       for(var i = 20; i < this.width; i += 20) {
-        this.c.strokeStyle = (i % 100 == 0) ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)';
+        stroke = (i % 100 == 0) ? this.style.grid.strokeThick : this.style.grid.strokeThick;
 
-        this.drawLine(new this.Point(i, 0), new this.Point(i, this.height));
+        this.drawLine(new this.Point(i, 0), new this.Point(i, this.height), {
+          width: this.style.grid.width,
+          stroke: stroke,
+          fill: null
+        });
       }
     }
 
     drawPath() {
-      var first = this.points[0];
+      var first = this.nodes[0];
       var last = first;
 
       this.c.beginPath();
       this.c.moveTo(last.x, last.y);
-      for(var i= 1; i < this.points.length; i++) {
-        var point = this.points[i];
+      for(var i= 1; i < this.nodes.length; i++) {
+        var current = this.nodes[i];
 
         if(i % 2 == 0) {
-          this.c.quadraticCurveTo(last.x, last.y, point.x, point.y);
+          this.c.quadraticCurveTo(last.x, last.y, current.x, current.y);
           this.c.stroke();
         }
 
-        last = point;
+        last = current;
       }
 
       if(this.close) {
@@ -255,214 +230,308 @@ var Track = (function() {
       }
     }
 
-    drawCircles() {
-      for(var i in this.points) {
+    drawNodes() {
+      for(var i in this.nodes) {
+        var style = (i % 2 == 0) ? this.style.point : this.style.smallPoint;
+
         this.c.beginPath();
-        if(i % 2 == 0) {
-          this.c.arc(this.points[i].x, this.points[i].y, this.style.point.radius,
-                     this.style.point.arc1, this.style.point.arc2, true );
-        }
-        else {
-          this.c.arc(this.points[i].x, this.points[i].y,
-                     this.style.smallPoint.radius, this.style.smallPoint.arc1,
-                     this.style.point.arc2, true);
-        }
+        this.c.arc(this.nodes[i].x, this.nodes[i].y,
+                   style.radius, style.arc1, style.arc2, true);
         this.c.fill();
         this.c.stroke();
       }
     }
 
-    drawMarkers() {
-      this.c.lineWidth = this.style.circles.width;
-      this.c.strokeStyle = this.style.circles.color;
-      this.c.fillStyle = this.style.circles.fill;
+    drawCircle(p, style) {
+        this.c.lineWidth = this.style.nodes.width;
+        this.c.strokeStyle = this.style.nodes.color;
+        this.c.fillStyle = this.style.nodes.fill;
 
-      for(var marker of this.markers) {
         this.c.beginPath();
-        this.c.arc(marker.x, marker.y,
-                   this.style.smallPoint.radius, this.style.smallPoint.arc1,
-                   this.style.point.arc2, true);
+        this.c.arc(p.x, p.y, style.radius, style.arc1, style.arc2, true);
         this.c.fill();
         this.c.stroke();
-      }
     }
 
-    drawGates() {
-      this.c.lineWidth = this.style.circles.width;
-      this.c.strokeStyle = this.style.circles.color;
-      this.c.fillStyle = this.style.circles.fill;
-
-      for(var gate of this.gates) {
-        var gate = gate.line;
-
-        this.drawLine(gate.p0, gate.p1);
+    getPathLength() {
+      var nodes = this.nodes;
+      var totalLength = 0;
+      var pointAmount = nodes.length - 1;
+      for(var i = 0; i < pointAmount - 1; i += 2) {
+        var b = new this.Bezier(nodes[i], nodes[i + 1], nodes[i + 2])
+        totalLength += b.getLength();
       }
+      var b = new this.Bezier(nodes[pointAmount-1], nodes[pointAmount], nodes[0])
+      totalLength += b.getLength();
+
+      return totalLength;
     }
 
-    placeMarkers(split, gateSplit, trackWidth) {
+  }
+
+  class Gate {
+    constructor(line, center, rotation=0) {
+      this.line = line;
+      this.center = center
+      this.rotation = rotation;
+    }
+  }
+
+  class Track {
+    constructor(canvas, xml) {
+      this.canvas = canvas;
+      this.xml = xml;
+
+      this.canvas_ = new Canvas(canvas);
+
+      this.id;
+      this.raceId;
+
+      this.singleLine = true;
+      this.gatesEnabled = false;
+
+      this.zOffset = 0;
+
+      this.m = Math2D;
+      this.Bezier = this.m.Bezier;
+      this.Point = this.m.Point;
+      this.Line = this.m.Line;
+
       this.markers = [];
       this.gates = [];
 
-      // Get length of all curves
-      var totalLength = 0;
-      var pointAmount = this.points.length - 1;
-      for(var i = 0; i < pointAmount - 1; i += 2) {
-        var b = new this.Bezier(this.points[i], this.points[i + 1], this.points[i + 2])
-        totalLength += b.getLength();
-      }
-      var b = new this.Bezier(this.points[pointAmount-1], this.points[pointAmount], this.points[0])
-      totalLength += b.getLength();
+      this.drawMarkers = function() {
+        for(var marker of this.markers) {
+          this.canvas_.drawCircle(marker, {
+            radius: 5,
+            arc1: 0,
+            arc2: 2 * Math.PI
+          });
+        }
+      }.bind(this);
 
-      // Optimize the split, so that the markers are equally spaced on the total
-      // available length.
-      var markerCount = Math.floor(totalLength / split);
-      var rest = totalLength % split;
-      split = split + (rest / markerCount);
-      var nextSplit = 0;
+      this.drawGates = function() {
+        for(var gate of this.gates) {
+          this.canvas_.drawLine(gate.line.p0, gate.line.p1, {
+            width: 2,
+            stroke: '#000',
+            fill: 'hsla(100, 93%, 50%, 1)'
+          });
+        }
+      }.bind(this);
 
-      var gateCount = Math.floor(totalLength / gateSplit);
-      rest = totalLength % gateSplit;
-      gateSplit = gateSplit + (rest / gateCount);
-      var nextGateSplit = 0;
+      this.placeMarkers = function(split, gateSplit, trackWidth) {
+        this.markers = [];
+        this.gates = [];
 
-      for(var i = 0; i < this.points.length - 1; i += 2) {
-        var p0 = this.points[i];
-        var p1 = this.points[i + 1];
-        var p2 = this.points[(i+2) % this.points.length];
-        var b = new this.Bezier(p0, p1, p2);
+        var points = this.canvas_.nodes;
+        var totalLength = this.canvas_.getPathLength();
 
-        var length;
-        var hadGateSplit = false;
-        var hadMarkerSplit = false;
-        for(var j = 0.0001; j <= 1; j += 0.0001) {
-          hadGateSplit = false;
-          hadMarkerSplit = false;
-          length = b.getLength(j);
+        // Optimize the split, so that the markers are equally spaced on the total
+        // available length.
+        var markerCount = Math.floor(totalLength / split);
+        var rest = totalLength % split;
+        split = split + (rest / markerCount);
+        var nextSplit = 0;
 
-          if(length >= nextSplit) {
-            hadMarkerSplit = true;
-            nextSplit += split;
-            var marker = b.getPoint(j);
+        var gateCount = Math.floor(totalLength / gateSplit);
+        rest = totalLength % gateSplit;
+        gateSplit = gateSplit + (rest / gateCount);
+        var nextGateSplit = 0;
 
-            if(this.singleLine) {
-              this.markers.push(marker);
+        for(var i = 0; i < points.length - 1; i += 2) {
+          var p0 = points[i];
+          var p1 = points[i + 1];
+          var p2 = points[(i+2) % points.length];
+          var b = new this.Bezier(p0, p1, p2);
+
+          var length;
+          var hadGateSplit = false;
+          var hadMarkerSplit = false;
+          for(var j = 0.0001; j <= 1; j += 0.0001) {
+            hadGateSplit = false;
+            hadMarkerSplit = false;
+            length = b.getLength(j);
+
+            if(length >= nextSplit) {
+              hadMarkerSplit = true;
+              nextSplit += split;
+              var marker = b.getPoint(j);
+
+              if(this.singleLine) {
+                this.markers.push(marker);
+              }
+              else {
+                var m1 = b.getOffsetPoint(j, trackWidth);
+                var m2 = b.getOffsetPoint(j, trackWidth * -1);
+
+                this.markers.push(m1);
+                this.markers.push(m2);
+              }
             }
-            else {
-              var m1 = b.getOffsetPoint(j, trackWidth);
-              var m2 = b.getOffsetPoint(j, trackWidth * -1);
 
-              this.markers.push(m1);
-              this.markers.push(m2);
+            if(length >= nextGateSplit) {
+              hadGateSplit = true;
+              nextGateSplit += gateSplit;
+              var marker = b.getPoint(j);
+              var gate = this.getGate(b, j);
+
+              this.gates.push(gate);
             }
           }
 
-          if(length >= nextGateSplit) {
-            hadGateSplit = true;
-            nextGateSplit += gateSplit;
-            var marker = b.getPoint(j);
-            var gate = this.getGate(b, j);
+          if(!hadMarkerSplit) nextSplit -= length;
+          if(!hadGateSplit) nextGateSplit -= length;
+        }
+      }.bind(this);
 
-            this.gates.push(gate);
-          }
+      this.getGate = function(b, t) {
+        var l1 = b.getOffsetPoint(t, 18.5);
+        var l2 = b.getOffsetPoint(t, -18.5);
+        var p = b.getPoint(t);
+
+        var p11 = new this.Point();
+        p11.x = (1 - t) * b.p0.x + t * b.p1.x;
+        p11.y = (1 - t) * b.p0.y + t * b.p1.y;
+
+        var angle = Math.atan2(p11.y - p.y, p11.x - p.x);
+        var line = new this.Line(l1, l2);
+        var gate = new Gate(line, p, angle * 180 / Math.PI );
+
+        return gate;
+      }.bind(this);
+
+      this.transfromCoords = function(p) {
+        var p = new this.Point(p.x, p.y);
+        p.x /= 10;
+        p.y /= 10;
+
+        if(p.y > (this.height / 10) / 2) {
+          p.x -= 30;
+          p.y -= 50;
+          p.y *= -1;
+        }
+        else {
+          p.x -= 30;
+          p.y += 50;
+          p.y *= -1;
+          p.y += 100;
         }
 
-        if(!hadMarkerSplit) nextSplit -= length;
-        if(!hadGateSplit) nextGateSplit -= length;
+        return p;
+      }.bind(this);
+
+      // Return a JSON representation of all Blueprint items
+      this.getTrackBlueprint = function(markerType, gateType, z) {
+        var markerType = markerType || 'DiscConeBlue01';
+        var gateType = gateType || 'AirgateBigLiftoffDark01';
+        var track = [];
+
+        for(var i in this.markers) {
+          var marker = this.markers[i];
+          var p = this.transfromCoords(marker);
+
+          track.push(this.getBlueprint(i, p, markerType, z));
+        }
+
+        if(this.gatesEnabled) {
+          for(var i in this.gates) {
+            var gate = this.gates[i];
+            var idx = parseInt(i) + this.markers.length;
+            var p = this.transfromCoords(gate.center);
+
+            track.push(this.getBlueprint(idx, p, gateType, z, gate.rotation + 90));
+          }
+
+          // Add the spawn point
+          var idx = this.markers.length + this.gates.length;
+          var first = this.transfromCoords(this.gates[0].center);
+          var spawn = this.getBlueprint(idx, first, 'SpawnPointSingle01', z, this.gates[0].rotation - 90);
+          track.push(spawn);
+        }
+
+        return track;
+      }.bind(this);
+
+      this.getBlueprint = function(id, p, type, z, rotation=0) {
+        var blueprint = {
+          'itemID': type,
+          'instanceID': id,
+          'position': {
+            'x': p.x,
+            'y': z,
+            'z': p.y
+          },
+          'rotation': {
+            'x': 0,
+            'y': rotation,
+            'z': 0
+          },
+          'purpose': 'Functional'
+        };
+
+        return blueprint;
       }
+
+      this.getCheckpoint = function(uuid, checkPointId, type, direction, next) {
+        var checkpoint = {
+          'uniqueId': uuid,
+          'checkPointID': checkPointId,
+          'passageType': type,
+          'directionality': direction,
+          'nextPassageIDs': {
+            'string': next
+          }
+        };
+
+        return checkpoint;
+      }
+
+      // Push the start point and add the first Segment
+      var start = new this.Point(20, 20);
+      var first = new this.Point(200, 300);
+
+      this.canvas_.nodes.push(start);
+      this.canvas_.addNode(first);
+      this.canvas_.draw();
     }
 
-    getGate(b, t) {
-      var l1 = b.getOffsetPoint(t, 18.5);
-      var l2 = b.getOffsetPoint(t, -18.5);
-      var p = b.getPoint(t);
-
-      var p11 = new this.Point();
-      p11.x = (1 - t) * b.p0.x + t * b.p1.x;
-      p11.y = (1 - t) * b.p0.y + t * b.p1.y;
-
-      var angle = Math.atan2(p11.y - p.y, p11.x - p.x);
-      var line = new this.Line(l1, l2);
-      var gate = new Gate(line, p, angle * 180 / Math.PI );
-
-      return gate;
+    addSegment() {
+      this.canvas_.addNode();
+      this.canvas_.draw();
     }
 
-    transfromCoords(p) {
-      var p = new this.Point(p.x, p.y);
-      p.x /= 10;
-      p.y /= 10;
-
-      if(p.y > (this.height / 10) / 2) {
-        p.x -= 30;
-        p.y -= 50;
-        p.y *= -1;
-      }
-      else {
-        p.x -= 30;
-        p.y += 50;
-        p.y *= -1;
-        p.y += 100;
-      }
-
-      return p;
+    deleteLastSegment() {
+      this.canvas_.deleteLastNode();
+      this.canvas_.draw();
     }
 
-    // Return a JSON representation of all Blueprint items
-    getTrackBlueprint(markerType, gateType) {
-      var markerType = markerType || 'DiscConeBlue01';
-      var gateType = gateType || 'AirgateBigLiftoffDark01';
-      var track = [];
+    close() {
+      this.canvas_.closePath();
+      this.canvas_.draw();
+    }
 
-      for(var i in this.markers) {
-        var marker = this.markers[i];
-        var p = this.transfromCoords(marker);
+    open() {
+      this.canvas_.openPath();
+      this.canvas_.draw();
+    }
 
-        track.push(this.getBlueprint(i, p, markerType));
-      }
+    preview(markerSplit, gateSplit, trackWidth) {
+      this.canvas_.clear();
+      this.canvas_.drawGrid();
+
+      this.placeMarkers(markerSplit, gateSplit, trackWidth);
+      this.drawMarkers();
 
       if(this.gatesEnabled) {
-        for(var i in this.gates) {
-          var gate = this.gates[i];
-          var idx = parseInt(i) + this.markers.length;
-          var p = this.transfromCoords(gate.center);
-
-          track.push(this.getBlueprint(idx, p, gateType, gate.rotation + 90));
-        }
-
-        // Add the spawn point
-        var idx = this.markers.length + this.gates.length;
-        var first = this.transfromCoords(this.gates[0].center);
-        var spawn = this.getBlueprint(idx, first, 'SpawnPointSingle01', this.gates[0].rotation - 90);
-        track.push(spawn);
+        this.drawGates();
       }
-
-      return track;
-    }
-
-    getBlueprint(id, p, type, rotation=0) {
-      var blueprint = {
-        'itemID': type,
-        'instanceID': id,
-        'position': {
-          'x': p.x,
-          'y': this.zOffset,
-          'z': p.y
-        },
-        'rotation': {
-          'x': 0,
-          'y': rotation,
-          'z': 0
-        },
-        'purpose': 'Functional'
-      };
-
-      return blueprint;
     }
 
     // Return a XML representation of the track, ready to print
-    getTrackXML(trackName, map, markerType, gateType) {
+    getTrackXML(trackName, map, z, markerType, gateType) {
       var trackXML = '<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment /><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>';
-      var blueprints = this.getTrackBlueprint(markerType, gateType);
+      var blueprints = this.getTrackBlueprint(markerType, gateType, z);
       var track = this.xml.xml_str2json(trackXML);
       var lastId = blueprints.length - 1;
 
@@ -479,20 +548,6 @@ var Track = (function() {
       }
 
       return this.xml.json2xml_str(track);
-    }
-
-    getCheckpoint(uuid, checkPointId, type, direction, next) {
-      var checkpoint = {
-        'uniqueId': uuid,
-        'checkPointID': checkPointId,
-        'passageType': type,
-        'directionality': direction,
-        'nextPassageIDs': {
-          'string': next
-        }
-      };
-
-      return checkpoint;
     }
 
     getRaceXML(raceName) {
@@ -537,6 +592,7 @@ var Track = (function() {
 
       return this.xml.json2xml_str(race);
     }
+
   }
 
   return { Track: Track };
