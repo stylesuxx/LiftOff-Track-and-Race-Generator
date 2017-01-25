@@ -123,7 +123,7 @@
       if(track.close) {
         track.close = false;
         $('.step-1').show();
-        $('#step-2').hide();
+        $('#step-2, #download-zip').hide();
         $('.rendered-track').remove();
         $('#marker-type option').remove();
 
