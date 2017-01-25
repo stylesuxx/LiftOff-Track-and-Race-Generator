@@ -496,14 +496,14 @@ var Track = (function() {
       return checkpoint;
     }
 
-    getRaceXML(id, raceName) {
+    getRaceXML(raceName) {
       var raceXML = '<?xml version="1.0" encoding="utf-16"?><Race xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.2</gameVersion><localID><str /><version>1</version><type>RACE</type></localID><name /><description /><dependencies><dependency><str /><version>1</version><type>TRACK</type></dependency></dependencies><checkPointPassages /><requiredLaps>3</requiredLaps><spawnPointID>-1</spawnPointID><validity>Valid</validity></Race>';
       var race = this.xml.xml_str2json(raceXML);
       var indexOffset = this.markers.length;
       var spawnPointID = this.markers.length + this.gates.length;
 
       // check if we need race ID
-      race['Race']['localID']['str'] = id;
+      race['Race']['localID']['str'] = this.raceId;
       race['Race']['name'] = raceName;
       race['Race']['dependencies']['dependency']['str'] = this.id;
       race['Race']['spawnPointID'] = spawnPointID;

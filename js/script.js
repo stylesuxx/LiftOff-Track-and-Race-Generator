@@ -149,7 +149,10 @@
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
       var trackWidth = $('#track-width').val() || 18.5;
+
+      // Generate and set track and race ID
       track.id = generateUUID();
+      track.raceId = generateUUID();
 
       track.clear();
       track.drawGrid();
@@ -160,7 +163,7 @@
         track.drawGates();
       }
 
-      $('.generate-button').removeClass('hidden');
+      $('.generate-button, #download-zip').removeClass('hidden');
     });
 
     /**
@@ -214,10 +217,43 @@
 
       // Give the DOM some time to update...
       setTimeout(function() {
-        var xml = track.getRaceXML(generateUUID(), raceName);
+        var xml = track.getRaceXML(raceName);
         attachXML(xml);
       },100);
     });
+
+    $('#download-zip').on('click', function() {
+      var zip = new JSZip();
+      var map = $('#map-name').val() || 'LiftoffArena';
+      var zOffset = $('#map-name option[value=' + map + ']').attr('z') || 0.0;
+      var trackName = $('#track-name').val() || 'Edgy no name track';
+      var markerType = $('#marker-type').val() || 'DiscConeBlue01';
+      var $generating = $('<div />', {
+        class: 'generating',
+        text: 'Generating Zip file - this may take some time...'
+      })
+      $('.rendered-track').append($generating);
+
+      setTimeout(function() {
+        track.zOffset = zOffset;
+        var trackXML = track.getTrackXML(trackName, map, markerType, 'AirgateBigLiftoffDark01');
+        zip.file('Liftoff_Data/Tracks/' + track.id + '/' + track.id + '.track', trackXML);
+
+        if(track.gatesEnabled) {
+          var raceName = $('#race-name').val() || 'Edgy no name race';
+          var raceXML = track.getRaceXML(raceName);
+          zip.file('Liftoff_Data/Races/' + track.raceId + '/' + track.raceId + '.race', raceXML);
+        }
+
+        zip.generateAsync({ type: 'blob' })
+        .then(function(blob) {
+          saveAs(blob, track.id + '.zip');
+
+          attachXML(trackXML);
+        });
+      }, 100);
+
+    })
 
     // Add the tracks as options to Step 1
     $(maps).each(function(index, item) {

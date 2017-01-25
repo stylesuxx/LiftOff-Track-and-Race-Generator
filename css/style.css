@@ -114,3 +114,11 @@ textarea.disabled {
 .about h2 {
   margin-top: 0px;
 }
+
+#download-zip {
+  position: absolute;
+  top: 0px;
+  right: 15px;
+  margin-top: -32px;
+  z-index: 100;
+}

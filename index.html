@@ -142,6 +142,7 @@
 
           <div class="col-md-12">
 
+            <button class="btn btn-success hidden" id="download-zip" title="Extract to the root of your LiftOff directory. Eg.: .steam/steam/steamapps/common/Liftoff">Download ZIP</button>
             <div class="canvas">
               <canvas id='canvas' height="1000" width="600" class="quadratic"></canvas>
             </div>
@@ -187,11 +188,14 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://zachofalltrades.github.io/jquery.format/jquery.format.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/x2js/1.2.0/xml2json.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/x2js/1.2.0/xml2json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
 
     <script src="js/math2d.js"></script>
     <script src="js/track.js"></script>
     <script src="js/script.js"></script>
+
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
