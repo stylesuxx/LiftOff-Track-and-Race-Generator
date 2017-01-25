@@ -40,6 +40,19 @@
     }
   ];
 
+  var maps = [
+    {
+      display: 'LiftOff Arena',
+      name: 'LiftoffArena',
+      zOffset: 0.1
+    },
+    {
+      display: 'The Drawing Board',
+      name: 'TheDrawingBoard',
+      zOffset: 0
+    }
+  ]
+
   // Register all click handlers
   $(document).ready(function() {
     function attachXML(xml) {
@@ -161,6 +174,8 @@
      * XML, we do also take care of this here.
      */
     $('#generate').on('click', function() {
+      var map = $('#map-name').val() || 'LiftoffArena';
+      var zOffset = $('#map-name option[value=' + map + ']').attr('z') || 0.0;
       var trackName = $('#track-name').val() || 'Edgy no name track';
       var markerType = $('#marker-type').val() || 'DiscConeBlue01';
       var $generating = $('<div />', {
@@ -171,7 +186,8 @@
 
       // Give the DOM some time to update before invoking track generation
       setTimeout(function() {
-        var xml = track.getTrackXML(trackName, markerType, 'AirgateBigLiftoffDark01');
+        track.zOffset = zOffset;
+        var xml = track.getTrackXML(trackName, map, markerType, 'AirgateBigLiftoffDark01');
         attachXML(xml);
       }, 100);
 
@@ -201,6 +217,17 @@
         var xml = track.getRaceXML(generateUUID(), raceName);
         attachXML(xml);
       },100);
+    });
+
+    // Add the tracks as options to Step 1
+    $(maps).each(function(index, item) {
+      var $option = $('<option />', {
+        text: item.display,
+        value: item.name,
+        z: item.zOffset
+      });
+
+      $('#map-name').append($option);
     });
   });
 

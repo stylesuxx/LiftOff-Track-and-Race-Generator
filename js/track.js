@@ -16,6 +16,8 @@ var Track = (function() {
 
       this.id;
 
+      this.zOffset = 0;
+
       this.drag = null;
       this.dpoint;
       this.addingPoint = false;
@@ -444,7 +446,7 @@ var Track = (function() {
         'instanceID': id,
         'position': {
           'x': p.x,
-          'y': 0.1,
+          'y': this.zOffset,
           'z': p.y
         },
         'rotation': {
@@ -459,14 +461,15 @@ var Track = (function() {
     }
 
     // Return a XML representation of the track, ready to print
-    getTrackXML(trackName, markerType, gateType) {
-      var trackXML = '<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment>LiftoffArena</environment><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>';
+    getTrackXML(trackName, map, markerType, gateType) {
+      var trackXML = '<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment /><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>';
       var blueprints = this.getTrackBlueprint(markerType, gateType);
       var track = this.xml.xml_str2json(trackXML);
       var lastId = blueprints.length - 1;
 
       track['Track']['localID']['str'] = this.id;
       track['Track']['name'] = trackName;
+      track['Track']['environment'] =  map;
       track['Track']['lastTrackItemID'] = lastId;
       track['Track']['blueprints'] = { 'TrackBlueprint': [] };
 
