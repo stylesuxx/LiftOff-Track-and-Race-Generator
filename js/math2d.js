@@ -35,6 +35,10 @@ var Math2D = (function() {
   }
 
   class Bezier {
+    /**
+     * This class uses the notation as per Wikipedia article
+     * https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Constructing_B.C3.A9zier_curves
+     */
     constructor(p0, p1, p2) {
       this.p0 = p0;
       this.p1 = p1;
@@ -43,30 +47,30 @@ var Math2D = (function() {
 
     // Return length at given time, or total length if not time was provided
     getLength(t=1) {
-      var a = new Point();
-      var b = new Point();
+      var q0 = new Point();
+      var q1 = new Point();
 
-      a.x = this.p0.x + this.p2.x - 2 * this.p1.x;
-      a.y = this.p0.y + this.p2.y - 2 * this.p1.y;
+      q0.x = this.p0.x + this.p2.x - 2 * this.p1.x;
+      q0.y = this.p0.y + this.p2.y - 2 * this.p1.y;
 
-      b.x = 2 * this.p1.x - 2 * this.p0.x;
-      b.y = 2 * this.p1.y - 2 * this.p0.y;
+      q1.x = 2 * this.p1.x - 2 * this.p0.x;
+      q1.y = 2 * this.p1.y - 2 * this.p0.y;
 
       // Special case when the curve is a line.
-      if(a.x == 0 && a.y == 0) {
-        b = new Point();
-        b.x = (1 - t) * this.p0.x + t * this.p2.x;
-        b.y = (1 - t) * this.p0.y + t * this.p2.y;
-        var line = new Line(this.p0, b)
+      if(q0.x == 0 && q0.y == 0) {
+        q1 = new Point();
+        q1.x = (1 - t) * this.p0.x + t * this.p2.x;
+        q1.y = (1 - t) * this.p0.y + t * this.p2.y;
+        var line = new Line(this.p0, q1)
 
         return line.getLength();
       }
 
-      var A = 4 * (Math.pow(a.x, 2) + Math.pow(a.y, 2));
-      var B = 4 * (a.x * b.x + a.y * b.y);
-      var C = Math.pow(b.x, 2) + Math.pow(b.y, 2);
+      var A = 4 * (Math.pow(q0.x, 2) + Math.pow(q0.y, 2));
+      var B = 4 * (q0.x * q1.x + q0.y * q1.y);
+      var C = Math.pow(q1.x, 2) + Math.pow(q1.y, 2);
 
-      b = B / (2 * A);
+      var b = B / (2 * A);
       var c = C / A;
       var u = t + b;
       var k = c - Math.pow(b, 2);
@@ -98,10 +102,11 @@ var Math2D = (function() {
 
     // Return the point on the curve at the specified time
     getPoint(t) {
-      var x = Math.pow((1 - t), 2) * this.p0.x + 2 * (1 - t) * t * this.p1.x + Math.pow(t, 2) * this.p2.x;
-      var y = Math.pow((1 - t), 2) * this.p0.y + 2 * (1 - t) * t * this.p1.y + Math.pow(t, 2) * this.p2.y;
+      var p = new Point();
+      p.x = Math.pow((1 - t), 2) * this.p0.x + 2 * (1 - t) * t * this.p1.x + Math.pow(t, 2) * this.p2.x;
+      p.y = Math.pow((1 - t), 2) * this.p0.y + 2 * (1 - t) * t * this.p1.y + Math.pow(t, 2) * this.p2.y;
 
-      return new Point(x, y);
+      return p;
     }
   }
 
