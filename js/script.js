@@ -120,9 +120,9 @@
 
     // Remove the connection between first and last node, return back to Step 1
     $('#undo-close').on('click', function() {
-      $('#step-2, #download-zip').hide();
-      $('#marker-type option').remove();
-      $('.rendered-track').remove();
+      $('#marker-type option, .rendered-track').remove();
+      $('#download-zip').addClass('hidden');
+      $('#step-2').hide();
       $('.step-1').show();
 
       track.open();
@@ -144,12 +144,12 @@
     $("#preview").on("click", function() {
       var markerSpacing = parseInt($('#marker-spacing').val()) || 10;
       var gateSpacing = parseInt($('#gate-spacing').val()) || 100;
-      var trackWidth = $('#track-width').val() || 18.5;
+      var trackWidth = $('#track-width').val() || 17.5;
 
       track.id = generateUUID();
       track.raceId = generateUUID();
 
-      track.preview(markerSpacing, gateSpacing, trackWidth)
+      track.preview(markerSpacing, gateSpacing, trackWidth);
 
       $('.generate-button, #download-zip').removeClass('hidden');
     });
@@ -244,6 +244,10 @@
       $('canvas').css({
         'background': '#f7f7f7'
       });
+    });
+
+    $('#snap-grid').on('change', function() {
+      track.toggleGridSnap();
     });
 
     // Add the tracks as options to Step 1

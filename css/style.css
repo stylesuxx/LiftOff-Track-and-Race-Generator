@@ -132,3 +132,7 @@ textarea.disabled {
 #background-image:hover {
   opacity: 1;
 }
+
+#snap-grid {
+  width: auto !important;
+}

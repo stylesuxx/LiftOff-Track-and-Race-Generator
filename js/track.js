@@ -14,6 +14,7 @@ var Track = (function() {
       this.dpoint = null;
       this.close = false;
       this.addingNode = false;
+      this.gridSnap = false;
 
       this.m = Math2D;
       this.Bezier = this.m.Bezier;
@@ -72,9 +73,17 @@ var Track = (function() {
       var dragging = function (event) {
         if(this.drag) {
           event = mousePos(event);
+          var moveX = event.x - this.dpoint.x;
+          var moveY = event.y - this.dpoint.y;
 
-          this.nodes[this.drag].x += event.x - this.dpoint.x;
-          this.nodes[this.drag].y += event.y - this.dpoint.y;
+          this.nodes[this.drag].x += moveX;
+          this.nodes[this.drag].y += moveY;
+
+          if(this.gridSnap) {
+            this.nodes[this.drag].x = Math.round(event.x / 20) * 20;
+            this.nodes[this.drag].y = Math.round(event.y / 20) * 20;
+          }
+
           this.dpoint = event;
 
           this.draw();
@@ -88,6 +97,11 @@ var Track = (function() {
 
           newest.x = event.x;
           newest.y = event.y;
+
+          if(this.gridSnap) {
+            newest.x = Math.round(event.x / 20) * 20;
+            newest.y = Math.round(event.y / 20) * 20;
+          }
 
           var line = new this.m.Line(last, newest);
           var midpoint = line.getMidpoint();
@@ -386,8 +400,8 @@ var Track = (function() {
       }.bind(this);
 
       this.getGate = function(b, t) {
-        var l1 = b.getOffsetPoint(t, 18.5);
-        var l2 = b.getOffsetPoint(t, -18.5);
+        var l1 = b.getOffsetPoint(t, 17.5);
+        var l2 = b.getOffsetPoint(t, -17.5);
         var p = b.getPoint(t);
 
         var p11 = new this.Point();
@@ -504,6 +518,10 @@ var Track = (function() {
     deleteLastSegment() {
       this.canvas_.deleteLastNode();
       this.canvas_.draw();
+    }
+
+    toggleGridSnap() {
+      this.canvas_.gridSnap = !this.canvas_.gridSnap;
     }
 
     close() {
