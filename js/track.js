@@ -555,6 +555,7 @@ var Track = (function() {
 
       track['Track']['localID']['str'] = this.id;
       track['Track']['name'] = trackName;
+      track['Track']['description'] = 'Generated with the [url=https://stylesuxx.github.io/LiftOff-Track-and-Race-Generator/]LiftOff Track and Race generator[/url].';
       track['Track']['environment'] =  map;
       track['Track']['lastTrackItemID'] = lastId;
       track['Track']['blueprints'] = { 'TrackBlueprint': [] };
