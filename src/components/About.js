@@ -25,6 +25,9 @@ class About extends React.Component {
           <p>The app will generate XML for the track and for the race if you
             chose so. The results simply need to be copied to your LiftOff
             Track and Race directories.</p>
+
+          <p><b>Tip:</b> Press <i>[CTRL]</i> and scroll your mousewheel to scale the page to
+            fit your screen. Press <i>[F11]</i> to enable full screen.</p>
         </div>
 
         <div className="disclaimer">

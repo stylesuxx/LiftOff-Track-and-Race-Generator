@@ -1,12 +1,12 @@
 import React from 'react';
 import cssmodules from 'react-css-modules';
 import {
-  Row,
-  Col,
-  Form,
-  FormGroup,
   FormControl,
-  Button
+  FormGroup,
+  Button,
+  Form,
+  Row,
+  Col
 } from 'react-bootstrap';
 import styles from './open.cssmodule.scss';
 import MonitoredTextbox from './MonitoredTextbox';
