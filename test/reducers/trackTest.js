@@ -11,7 +11,6 @@ import {
   STOP_ADDING_POINT,
   CLOSE_TRACK,
   OPEN_TRACK,
-  RENDER_PREVIEW,
   SET_NAME,
   SET_MARKER_TYPE
 } from '../../src/actions/const';
@@ -123,16 +122,6 @@ describe('track reducer', () => {
 
     it('should reset the closed prop', (done) => {
       expect(newState.closed).to.be.false;
-      done();
-    });
-  });
-
-  describe('RENDER_PREVIEW action', (done) => {
-    const state = Object.freeze({ trackRendered: true });
-    const newState = reducer(state, {type: RENDER_PREVIEW});
-
-    it('should reset the closed prop', (done) => {
-      expect(newState.trackRendered).to.be.false;
       done();
     });
   });

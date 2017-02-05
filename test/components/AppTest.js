@@ -19,7 +19,6 @@ describe('<App />', function () {
       addingNode: false,
       height: 1000,
       width: 600,
-      trackRendered: true,
       trackWidth: 17.5,
       map: 'LiftoffArena',
       name: 'Trackname',
@@ -27,6 +26,7 @@ describe('<App />', function () {
     };
 
     canvas = {
+      trackRendered: true,
       nodeDeleted: true,
       nodeAdded: true,
       gridSnap: false

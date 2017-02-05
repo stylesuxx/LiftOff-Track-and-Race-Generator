@@ -29,7 +29,7 @@ class Canvas extends React.Component {
       this.props.actions.deletePoint();
     }
 
-    if (!nextProps.track.trackRendered) {
+    if (!nextProps.canvas.trackRendered) {
       const doubleLine = this.props.track.doubleLine;
       const markerSpacing = this.props.track.markerSpacing;
       const gateSpacing = this.props.track.gateSpacing;
@@ -116,11 +116,11 @@ Canvas.displayName = 'Canvas';
 Canvas.propTypes = {
   actions: React.PropTypes.shape({
     stopAddingPoint: React.PropTypes.func.isRequired,
+    enableDownload: React.PropTypes.func.isRequired,
+    renderPreview: React.PropTypes.func.isRequired,
     setTrackText: React.PropTypes.func.isRequired,
     setRaceText: React.PropTypes.func.isRequired,
-    renderPreview: React.PropTypes.func.isRequired,
-    deletePoint: React.PropTypes.func.isRequired,
-    enableDownload: React.PropTypes.func.isRequired
+    deletePoint: React.PropTypes.func.isRequired
   }),
   track: React.PropTypes.shape({
     markerSpacing: React.PropTypes.number.isRequired,
@@ -137,6 +137,7 @@ Canvas.propTypes = {
     map: React.PropTypes.string.isRequired
   }),
   canvas: React.PropTypes.shape({
+    trackRendered: React.PropTypes.bool.isRequired,
     nodeDeleted: React.PropTypes.bool.isRequired,
     nodeAdded: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
@@ -146,26 +147,26 @@ Canvas.propTypes = {
 Canvas.defaultProps = {
   actions: {
     stopAddingPoint: () => {},
+    enableDownload: () => {},
+    renderPreview: () => {},
     setTrackText: () => {},
     setRaceText: () => {},
-    renderPreview: () => {},
-    deletePoint: () => {},
-    enableDownload: () => {}
+    deletePoint: () => {}
   },
   track: {
+    markerType: 'DiscConeBlue01',
+    name: 'Trackname 01',
+    map: 'LiftoffArena',
     gatesEnabled: false,
-    trackRendered: true,
     addingNode: false,
     markerSpacing: 20,
     doubleLine: false,
     gateSpacing: 100,
     height: 1000,
-    width: 600,
-    map: 'LiftoffArena',
-    name: 'Trackname',
-    markerType: 'DiscConeBlue01'
+    width: 600
   },
   canvas: {
+    trackRendered: true,
     nodeDeleted: true,
     nodeAdded: true,
     gridSnap: false

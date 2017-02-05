@@ -8,28 +8,28 @@ import React, {
   Component,
   PropTypes
 } from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {
-  toggleGates,
   toggleDoubleLine,
-  toggleClosed,
   setMarkerSpacing,
-  setGateSpacing,
-  setMap,
   startAddingPoint,
   stopAddingPoint,
-  closeTrack,
-  openTrack,
-  deletePoint,
+  setGateSpacing,
   toggleGridSnap,
+  enableDownload,
   renderPreview,
   setTrackWidth,
+  setMarkerType,
+  toggleClosed,
   setTrackText,
-  setName,
+  toggleGates,
+  deletePoint,
   setRaceText,
-  enableDownload,
-  setMarkerType
+  closeTrack,
+  openTrack,
+  setName,
+  setMap
 } from '../actions/';
 import Main from '../components/App';
 /* Populated by react-webpack-redux:reducer */
@@ -52,39 +52,39 @@ class App extends Component {
  */
 App.propTypes = {
   actions: PropTypes.shape({
-    toggleGates: PropTypes.func.isRequired,
     toggleDoubleLine: PropTypes.func.isRequired,
     setMarkerSpacing: PropTypes.func.isRequired,
-    setGateSpacing: PropTypes.func.isRequired,
-    setMap: PropTypes.func.isRequired,
     startAddingPoint: PropTypes.func.isRequired,
     stopAddingPoint: PropTypes.func.isRequired,
-    closeTrack: PropTypes.func.isRequired,
-    openTrack: PropTypes.func.isRequired,
-    deletePoint: PropTypes.func.isRequired,
+    setGateSpacing: PropTypes.func.isRequired,
     toggleGridSnap: PropTypes.func.isRequired,
+    enableDownload: PropTypes.func.isRequired,
     renderPreview: PropTypes.func.isRequired,
     setTrackWidth: PropTypes.func.isRequired,
+    setMarkerType: PropTypes.func.isRequired,
     setTrackText: PropTypes.func.isRequired,
-    setName: PropTypes.func.isRequired,
+    toggleGates: PropTypes.func.isRequired,
+    deletePoint: PropTypes.func.isRequired,
     setRaceText: PropTypes.func.isRequired,
-    enableDownload: PropTypes.func.isRequired,
-    setMarkerType: PropTypes.func.isRequired
+    closeTrack: PropTypes.func.isRequired,
+    openTrack: PropTypes.func.isRequired,
+    setName: PropTypes.func.isRequired,
+    setMap: PropTypes.func.isRequired
   }),
   track: PropTypes.shape({
+    trackWidth: React.PropTypes.number.isRequired,
     markerSpacing: PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
     gateSpacing: PropTypes.number.isRequired,
+    width: React.PropTypes.number.isRequired,
     gatesEnabled: PropTypes.bool.isRequired,
+    name: React.PropTypes.string.isRequired,
     addingNode: PropTypes.bool.isRequired,
     doubleLine: PropTypes.bool.isRequired,
     closed: PropTypes.bool.isRequired,
-    width: React.PropTypes.number.isRequired,
-    height: React.PropTypes.number.isRequired,
-    trackWidth: React.PropTypes.number.isRequired,
-    trackRendered: PropTypes.bool.isRequired,
-    name: React.PropTypes.string.isRequired
   }),
   canvas: PropTypes.shape({
+    trackRendered: React.PropTypes.bool.isRequired,
     nodeDeleted: React.PropTypes.bool.isRequired,
     nodeAdded: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
@@ -104,8 +104,8 @@ App.propTypes = {
 function mapStateToProps(state) {
   /* Populated by react-webpack-redux:reducer */
   const props = {
-    track: state.track,
     canvas: state.canvas,
+    track: state.track,
     xml: state.xml
   };
   return props;
@@ -113,25 +113,25 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   /* Populated by react-webpack-redux:action */
   const actions = {
-    toggleGates,
     toggleDoubleLine,
-    toggleClosed,
     setMarkerSpacing,
-    setGateSpacing,
-    setMap,
     startAddingPoint,
     stopAddingPoint,
-    closeTrack,
-    openTrack,
-    deletePoint,
+    setGateSpacing,
     toggleGridSnap,
+    enableDownload,
     renderPreview,
     setTrackWidth,
+    setMarkerType,
+    toggleClosed,
     setTrackText,
-    setName,
+    toggleGates,
+    deletePoint,
     setRaceText,
-    enableDownload,
-    setMarkerType
+    closeTrack,
+    openTrack,
+    setName,
+    setMap
   };
   const actionMap = { actions: bindActionCreators(actions, dispatch) };
   return actionMap;

@@ -6,13 +6,15 @@
 import {
   START_ADDING_POINT,
   STOP_ADDING_POINT,
-  DELETE_POINT,
-  TOGGLE_GRID_SNAP
+  TOGGLE_GRID_SNAP,
+  RENDER_PREVIEW,
+  DELETE_POINT
 } from '../actions/const';
 
 const initialState = {
-  nodeAdded: true,
+  trackRendered: true,
   nodeDeleted: true,
+  nodeAdded: true,
   gridSnap: false
 };
 
@@ -42,6 +44,11 @@ function reducer(state = initialState, action) {
     case TOGGLE_GRID_SNAP: {
       nextState.gridSnap = !nextState.gridSnap;
 
+      return nextState;
+    }
+
+    case RENDER_PREVIEW: {
+      nextState.trackRendered = !nextState.trackRendered;
       return nextState;
     }
 

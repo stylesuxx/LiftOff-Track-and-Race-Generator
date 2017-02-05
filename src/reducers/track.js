@@ -4,19 +4,18 @@
  * src/container/App.js accordingly.
  */
 import {
-  TOGGLE_GATES,
   TOGGLE_DOUBLE_LINE,
   SET_MARKER_SPACING,
-  SET_GATE_SPACING,
-  SET_TRACK_WIDTH,
-  SET_MAP,
   START_ADDING_POINT,
   STOP_ADDING_POINT,
+  SET_GATE_SPACING,
+  SET_MARKER_TYPE,
+  SET_TRACK_WIDTH,
+  TOGGLE_GATES,
   CLOSE_TRACK,
   OPEN_TRACK,
-  RENDER_PREVIEW,
   SET_NAME,
-  SET_MARKER_TYPE
+  SET_MAP
 } from '../actions/const';
 
 const initialState = {
@@ -29,10 +28,9 @@ const initialState = {
   gateSpacing: 100,
   trackWidth: 17.5,
   closed: false,
-  width: 600,
   height: 1000,
+  width: 600,
 
-  trackRendered: true,
   addingNode: false,
 };
 
@@ -82,11 +80,6 @@ function reducer(state = initialState, action) {
 
     case STOP_ADDING_POINT: {
       nextState.addingNode = false;
-      return nextState;
-    }
-
-    case RENDER_PREVIEW: {
-      nextState.trackRendered = !nextState.trackRendered;
       return nextState;
     }
 

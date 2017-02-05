@@ -93,17 +93,17 @@ AppComponent.propTypes = {
     markerSpacing: React.PropTypes.number.isRequired,
     gateSpacing: React.PropTypes.number.isRequired,
     gatesEnabled: React.PropTypes.bool.isRequired,
+    markerType: React.PropTypes.string.isRequired,
+    trackWidth: React.PropTypes.number.isRequired,
     addingNode: React.PropTypes.bool.isRequired,
     doubleLine: React.PropTypes.bool.isRequired,
     height: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
     closed: React.PropTypes.bool.isRequired,
     name: React.PropTypes.string.isRequired,
-    markerType: React.PropTypes.string.isRequired,
-    trackRendered: React.PropTypes.bool.isRequired,
-    trackWidth: React.PropTypes.number.isRequired,
   }),
   canvas: React.PropTypes.shape({
+    trackRendered: React.PropTypes.bool.isRequired,
     nodeDeleted: React.PropTypes.bool.isRequired,
     nodeAdded: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
@@ -143,20 +143,21 @@ AppComponent.defaultProps = {
     setMap: () => {}
   },
   track: {
-    markerType: 'DiscConeBlue01',
-    trackRendered: true,
+    markerType: 'DiscConeBlue01 (App.js)',
+    name: 'Trackname 01 (App.js)',
     gatesEnabled: false,
-    addingNode: false,
     markerSpacing: 20,
     doubleLine: false,
-    name: 'Trackname',
     trackWidth: 17.5,
     gateSpacing: 100,
     closed: false,
     height: 1000,
-    width: 600
+    width: 600,
+
+    addingNode: false,
   },
   canvas: {
+    trackRendered: true,
     nodeDeleted: true,
     nodeAdded: true,
     gridSnap: false

@@ -11,7 +11,6 @@ describe('<Canvas />', function () {
   let canvas;
   beforeEach(function () {
     track = {
-      trackRendered: true,
       gatesEnabled: false,
       markerSpacing: 20,
       addingNode: false,
@@ -27,6 +26,7 @@ describe('<Canvas />', function () {
     };
 
     canvas = {
+      trackRendered: true,
       nodeDeleted: true,
       nodeAdded: true,
       gridSnap: false
@@ -48,7 +48,7 @@ describe('<Canvas />', function () {
 
     it('should have a className of "canvas-component"', function () {
       component = mount(<Canvas track={track} actions={actions} canvas={canvas} />);
-      track.trackRendered = false;
+      canvas.trackRendered = false;
       component.update();
       expect(component.hasClass('canvas-component')).to.equal(true);
     });
@@ -59,7 +59,7 @@ describe('<Canvas />', function () {
     it('should have a className of "canvas-component"', function () {
       track.doubleLine = true;
       component = mount(<Canvas track={track} actions={actions} canvas={canvas} />);
-      track.trackRendered = false;
+      canvas.trackRendered = false;
       component.update();
 
       expect(component.hasClass('canvas-component')).to.equal(true);
@@ -70,7 +70,7 @@ describe('<Canvas />', function () {
 
     it('should have a className of "canvas-component"', function () {
       track.gatesEnabled = true;
-      track.trackRendered = false;
+      canvas.trackRendered = false;
 
       component = mount(<Canvas track={track} actions={actions} canvas={canvas} />);
 

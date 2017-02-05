@@ -4,7 +4,8 @@ import {
   START_ADDING_POINT,
   STOP_ADDING_POINT,
   DELETE_POINT,
-  TOGGLE_GRID_SNAP
+  TOGGLE_GRID_SNAP,
+  RENDER_PREVIEW
 } from '../../src/actions/const';
 
 describe('canvas reducer', () => {
@@ -69,6 +70,16 @@ describe('canvas reducer', () => {
     it('should call toggleGridSnap of the canvas', (done) => {
       expect(newState.gridSnap).to.be.true;
 
+      done();
+    });
+  });
+
+  describe('RENDER_PREVIEW action', (done) => {
+    const state = Object.freeze({ trackRendered: true });
+    const newState = reducer(state, {type: RENDER_PREVIEW});
+
+    it('should reset the trackRendered', (done) => {
+      expect(newState.trackRendered).to.be.false;
       done();
     });
   });
