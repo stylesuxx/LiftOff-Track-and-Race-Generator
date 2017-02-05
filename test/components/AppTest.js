@@ -11,24 +11,23 @@ describe('<App />', function () {
   let component;
   beforeEach(function () {
     track = {
-      closed: false,
-      markerSpacing: 20,
-      gateSpacing: 20,
-      gatesEnabled: false,
-      doubleLine: false,
-      addingNode: false,
-      height: 1000,
-      width: 600,
-      trackWidth: 17.5,
+      name: 'Trackname 01',
       map: 'LiftoffArena',
-      name: 'Trackname',
-      markerType: 'foo'
+      gatesEnabled: false,
+      markerSpacing: 20,
+      doubleLine: false,
+      markerType: 'foo',
+      trackWidth: 17.5,
+      gateSpacing: 20,
+      closed: false,
+      height: 1000,
+      width: 600
     };
 
     canvas = {
       trackRendered: true,
       nodeDeleted: true,
-      nodeAdded: true,
+      addingNode: false,
       gridSnap: false
     };
 

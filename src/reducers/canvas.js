@@ -14,7 +14,7 @@ import {
 const initialState = {
   trackRendered: true,
   nodeDeleted: true,
-  nodeAdded: true,
+  addingNode: false,
   gridSnap: false
 };
 
@@ -22,18 +22,6 @@ function reducer(state = initialState, action) {
   const nextState = Object.assign({}, state);
 
   switch (action.type) {
-
-    case START_ADDING_POINT: {
-      nextState.nodeAdded = false;
-
-      return nextState;
-    }
-
-    case STOP_ADDING_POINT: {
-      nextState.nodeAdded = true;
-
-      return nextState;
-    }
 
     case DELETE_POINT: {
       nextState.nodeDeleted = !nextState.nodeDeleted;
@@ -49,6 +37,16 @@ function reducer(state = initialState, action) {
 
     case RENDER_PREVIEW: {
       nextState.trackRendered = !nextState.trackRendered;
+      return nextState;
+    }
+
+    case START_ADDING_POINT: {
+      nextState.addingNode = true;
+      return nextState;
+    }
+
+    case STOP_ADDING_POINT: {
+      nextState.addingNode = false;
       return nextState;
     }
 

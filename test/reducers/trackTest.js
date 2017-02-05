@@ -1,18 +1,16 @@
 var reducer = require('../../src/reducers/track');
 
 import {
-  TOGGLE_GATES,
   TOGGLE_DOUBLE_LINE,
   SET_MARKER_SPACING,
-  SET_TRACK_WIDTH,
   SET_GATE_SPACING,
-  SET_MAP,
-  START_ADDING_POINT,
-  STOP_ADDING_POINT,
+  SET_TRACK_WIDTH,
+  SET_MARKER_TYPE,
+  TOGGLE_GATES,
   CLOSE_TRACK,
   OPEN_TRACK,
   SET_NAME,
-  SET_MARKER_TYPE
+  SET_MAP
 } from '../../src/actions/const';
 
 describe('track reducer', () => {
@@ -82,26 +80,6 @@ describe('track reducer', () => {
 
     it('should update the map prop', (done) => {
       expect(newState.map).to.eql('OtherMap');
-      done();
-    });
-  });
-
-  describe('START_ADDING_POINT action', (done) => {
-    const state = Object.freeze({ addingNode: false });
-    const newState = reducer(state, {type: START_ADDING_POINT});
-
-    it('should set the addingNode prop', (done) => {
-      expect(newState.addingNode).to.be.true;
-      done();
-    });
-  });
-
-  describe('STOP_ADDING_POINT action', (done) => {
-    const state = Object.freeze({ addingNode: true });
-    const newState = reducer(state, {type: STOP_ADDING_POINT});
-
-    it('should reset the addingNode prop', (done) => {
-      expect(newState.addingNode).to.be.false;
       done();
     });
   });

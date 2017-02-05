@@ -95,7 +95,6 @@ AppComponent.propTypes = {
     gatesEnabled: React.PropTypes.bool.isRequired,
     markerType: React.PropTypes.string.isRequired,
     trackWidth: React.PropTypes.number.isRequired,
-    addingNode: React.PropTypes.bool.isRequired,
     doubleLine: React.PropTypes.bool.isRequired,
     height: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
@@ -105,7 +104,7 @@ AppComponent.propTypes = {
   canvas: React.PropTypes.shape({
     trackRendered: React.PropTypes.bool.isRequired,
     nodeDeleted: React.PropTypes.bool.isRequired,
-    nodeAdded: React.PropTypes.bool.isRequired,
+    addingNode: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
   }),
   xml: React.PropTypes.shape({
@@ -152,14 +151,12 @@ AppComponent.defaultProps = {
     gateSpacing: 100,
     closed: false,
     height: 1000,
-    width: 600,
-
-    addingNode: false,
+    width: 600
   },
   canvas: {
     trackRendered: true,
     nodeDeleted: true,
-    nodeAdded: true,
+    addingNode: false,
     gridSnap: false
   },
   xml: {

@@ -11,24 +11,23 @@ describe('<Canvas />', function () {
   let canvas;
   beforeEach(function () {
     track = {
+      name: 'Trackname 01',
+      map: 'LiftoffArena',
       gatesEnabled: false,
       markerSpacing: 20,
-      addingNode: false,
+      doubleLine: false,
+      markerType: 'foo',
       gateSpacing: 100,
+      trackWidth: 17.5,
       closed: false,
       height: 1000,
-      width: 600,
-      trackWidth: 17.5,
-      doubleLine: false,
-      map: 'LiftoffArena',
-      name: 'Trackname',
-      markerType: 'foo'
+      width: 600
     };
 
     canvas = {
       trackRendered: true,
       nodeDeleted: true,
-      nodeAdded: true,
+      addingNode: false,
       gridSnap: false
     };
 
@@ -84,8 +83,7 @@ describe('<Canvas />', function () {
     it('should trigger STOP_ADDING_POINT action', function() {
       const wrapper = component.find('canvas');
 
-      canvas.nodeAdded = false;
-      track.addingNode = true;
+      canvas.addingNode = true;
 
       component.update();
 

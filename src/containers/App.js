@@ -79,15 +79,14 @@ App.propTypes = {
     width: React.PropTypes.number.isRequired,
     gatesEnabled: PropTypes.bool.isRequired,
     name: React.PropTypes.string.isRequired,
-    addingNode: PropTypes.bool.isRequired,
     doubleLine: PropTypes.bool.isRequired,
-    closed: PropTypes.bool.isRequired,
+    closed: PropTypes.bool.isRequired
   }),
   canvas: PropTypes.shape({
     trackRendered: React.PropTypes.bool.isRequired,
     nodeDeleted: React.PropTypes.bool.isRequired,
-    nodeAdded: React.PropTypes.bool.isRequired,
-    gridSnap: React.PropTypes.bool.isRequired
+    gridSnap: React.PropTypes.bool.isRequired,
+    addingNode: PropTypes.bool.isRequired
   }),
   xml: React.PropTypes.shape({
     download: React.PropTypes.bool.isRequired,

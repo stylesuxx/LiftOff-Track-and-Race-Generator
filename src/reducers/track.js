@@ -6,8 +6,6 @@
 import {
   TOGGLE_DOUBLE_LINE,
   SET_MARKER_SPACING,
-  START_ADDING_POINT,
-  STOP_ADDING_POINT,
   SET_GATE_SPACING,
   SET_MARKER_TYPE,
   SET_TRACK_WIDTH,
@@ -29,9 +27,7 @@ const initialState = {
   trackWidth: 17.5,
   closed: false,
   height: 1000,
-  width: 600,
-
-  addingNode: false,
+  width: 600
 };
 
 function reducer(state = initialState, action) {
@@ -70,16 +66,6 @@ function reducer(state = initialState, action) {
 
     case SET_MAP: {
       nextState.map = action.parameter;
-      return nextState;
-    }
-
-    case START_ADDING_POINT: {
-      nextState.addingNode = true;
-      return nextState;
-    }
-
-    case STOP_ADDING_POINT: {
-      nextState.addingNode = false;
       return nextState;
     }
 

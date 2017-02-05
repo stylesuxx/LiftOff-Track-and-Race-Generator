@@ -62,13 +62,13 @@ class Canvas extends React.Component {
       this.props.actions.enableDownload();
     }
 
-    if (!nextProps.canvas.nodeAdded) {
+    if (nextProps.canvas.addingNode) {
       this.c.addNode();
     }
   }
 
   onMouseMove(e) {
-    if (this.props.track.addingNode) {
+    if (this.props.canvas.addingNode) {
       this.c.adding(e);
     } else {
       this.c.dragging(e);
@@ -80,7 +80,7 @@ class Canvas extends React.Component {
   }
 
   onMouseDown(e) {
-    const adding = this.props.track.addingNode;
+    const adding = this.props.canvas.addingNode;
 
     if (adding) {
       this.c.stopAdding();
@@ -129,7 +129,6 @@ Canvas.propTypes = {
     gatesEnabled: React.PropTypes.bool.isRequired,
     trackWidth: React.PropTypes.number.isRequired,
     doubleLine: React.PropTypes.bool.isRequired,
-    addingNode: React.PropTypes.bool.isRequired,
     height: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
     closed: React.PropTypes.bool.isRequired,
@@ -139,7 +138,7 @@ Canvas.propTypes = {
   canvas: React.PropTypes.shape({
     trackRendered: React.PropTypes.bool.isRequired,
     nodeDeleted: React.PropTypes.bool.isRequired,
-    nodeAdded: React.PropTypes.bool.isRequired,
+    addingNode: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
   })
 };
@@ -158,7 +157,6 @@ Canvas.defaultProps = {
     name: 'Trackname 01',
     map: 'LiftoffArena',
     gatesEnabled: false,
-    addingNode: false,
     markerSpacing: 20,
     doubleLine: false,
     gateSpacing: 100,
@@ -168,7 +166,7 @@ Canvas.defaultProps = {
   canvas: {
     trackRendered: true,
     nodeDeleted: true,
-    nodeAdded: true,
+    addingNode: false,
     gridSnap: false
   }
 };

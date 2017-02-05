@@ -28,26 +28,29 @@ describe('canvas reducer', () => {
 
   describe('START_ADDING_POINT action', (done) => {
     const state = Object.freeze({
-      nodeAdded: true
+      nodeAdded: true,
+      addingNode: false,
     });
-    const newState = reducer(state, {type: START_ADDING_POINT});
 
-    it('should call addNode of the canvas', (done) => {
-      expect(newState.nodeAdded).to.be.false;
+    it('should set addingNode prop', (done) => {
+      const newState = reducer(state, {type: START_ADDING_POINT});
 
+      expect(newState.addingNode).to.be.true;
       done();
     });
   });
 
   describe('STOP_ADDING_POINT action', (done) => {
     const state = Object.freeze({
-      nodeAdded: false
+      nodeAdded: false,
+      addingNode: true,
     });
-    const newState = reducer(state, {type: STOP_ADDING_POINT});
 
-    it('should call stopAdding of the canvas', (done) => {
-      expect(newState.nodeAdded).to.be.true;
 
+    it('should set nodeAdded of the canvas', (done) => {
+      const newState = reducer(state, {type: STOP_ADDING_POINT});
+
+      expect(newState.addingNode).to.be.false;
       done();
     });
   });
