@@ -15,7 +15,7 @@ class Footer extends React.Component {
         <Col md={12}>
           <footer className="footer" styleName={styles.footer}>
             <p>&copy; <a href="mailto:stylesuxx@gmail.com">stylesuxx</a> 2017
-              | Powered by <a href="https://github.com/stylesuxx/generator-react-webpack-redux">React, Redux</a> & Canvas | Hosted on Gihub Pages |
+              | Powered by <a href="https://github.com/stylesuxx/generator-react-webpack-redux">React, Redux</a> & Canvas | Hosted on <a href="https://pages.github.com/">Gihub Pages</a> |&nbsp;
               <a href="https://github.com/stylesuxx/LiftOff-Track-and-Race-Generator">Github Repository</a> | Travis CI</p>
           </footer>
         </Col>
