@@ -58,7 +58,6 @@ class About extends React.Component {
         </div>
 
         <div className="video">
-          <h3>On YouTube</h3>
           <iframe width="560" height="315" src="https://www.youtube.com/embed/QRGGEBZoILc" allowFullScreen />
         </div>
       </div>
