@@ -11,7 +11,9 @@ class TrackSettings extends React.Component {
       return (
         <Closed
           className="tracksettings-component"
-          track={this.props.track} actions={this.props.actions} />
+          track={this.props.track}
+          actions={this.props.actions}
+          xml={this.props.xml} />
       );
     }
 
@@ -45,10 +47,18 @@ TrackSettings.propTypes = {
     gateSpacing: React.PropTypes.number.isRequired,
     gatesEnabled: React.PropTypes.bool.isRequired,
     doubleLine: React.PropTypes.bool.isRequired,
-    closed: React.PropTypes.bool.isRequired,
-    trackText: React.PropTypes.string.isRequired,
-    raceText: React.PropTypes.string.isRequired
-  })
+    closed: React.PropTypes.bool.isRequired
+  }),
+  xml: React.PropTypes.shape({
+    track: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired,
+    race: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired
+  }).isRequired
 };
 /* istanbul ignore next */
 TrackSettings.defaultProps = {
@@ -73,9 +83,17 @@ TrackSettings.defaultProps = {
     markerSpacing: 20,
     doubleLine: false,
     gateSpacing: 100,
-    closed: false,
-    trackText: 'Initial Track text',
-    raceText: 'Initial Race text'
+    closed: false
+  },
+  xml: {
+    track: {
+      id: 'Track Id',
+      value: '--- Hit preview to render Track XML ---'
+    },
+    race: {
+      id: 'Race Id',
+      value: '--- Gates need to be enabled ---'
+    }
   }
 };
 

@@ -35,8 +35,14 @@ import Main from '../components/App';
 /* Populated by react-webpack-redux:reducer */
 class App extends Component {
   render() {
-    const {actions, track, canvas} = this.props;
-    return <Main actions={actions} track={track} canvas={canvas}/>;
+    const {actions, track, canvas, xml} = this.props;
+    return (
+      <Main
+        actions={actions}
+        track={track}
+        canvas={canvas}
+        xml={xml}/>
+    );
   }
 }
 /* Populated by react-webpack-redux:reducer
@@ -75,8 +81,6 @@ App.propTypes = {
     width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number.isRequired,
     trackWidth: React.PropTypes.number.isRequired,
-    trackText: React.PropTypes.string.isRequired,
-    raceText: React.PropTypes.string.isRequired,
     trackRendered: PropTypes.bool.isRequired,
     name: React.PropTypes.string.isRequired
   }),
@@ -84,13 +88,24 @@ App.propTypes = {
     nodeDeleted: React.PropTypes.bool.isRequired,
     nodeAdded: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
-  })
+  }),
+  xml: React.PropTypes.shape({
+    track: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired,
+    race: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired
+  }).isRequired
 };
 function mapStateToProps(state) {
   /* Populated by react-webpack-redux:reducer */
   const props = {
     track: state.track,
-    canvas: state.canvas
+    canvas: state.canvas,
+    xml: state.xml
   };
   return props;
 }

@@ -24,11 +24,7 @@ describe('<TrackSettings />', function () {
       markerSpacing: 20,
       gatesEnabled: false,
       trackWidth: 17.5,
-      download: false,
-      trackText: 'Initial Track text',
-      raceText: 'Initial Race text',
-      trackId: 'Track Id',
-      raceId: 'Race Id'
+      download: false
     };
 
     component = shallow(<TrackSettings track={track} />);

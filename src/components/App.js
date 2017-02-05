@@ -23,8 +23,8 @@ class AppComponent extends React.Component {
     if (this.props.track.closed) {
       rightColumn = (<Textarea
         gatesEnabled={this.props.track.gatesEnabled}
-        trackText={this.props.track.trackText}
-        raceText={this.props.track.raceText} />);
+        trackText={this.props.xml.track.value}
+        raceText={this.props.xml.race.value} />);
     }
 
     return (
@@ -33,7 +33,8 @@ class AppComponent extends React.Component {
         <TrackSettings
           actions={this.props.actions}
           canvas={this.props.canvas}
-          track={this.props.track} />
+          track={this.props.track}
+          xml={this.props.xml} />
 
         <Row>
           <Col md={12}>
@@ -97,8 +98,6 @@ AppComponent.propTypes = {
     height: React.PropTypes.number.isRequired,
     width: React.PropTypes.number.isRequired,
     closed: React.PropTypes.bool.isRequired,
-    trackText: React.PropTypes.string.isRequired,
-    raceText: React.PropTypes.string.isRequired,
     name: React.PropTypes.string.isRequired,
     markerType: React.PropTypes.string.isRequired,
     trackRendered: React.PropTypes.bool.isRequired,
@@ -108,7 +107,17 @@ AppComponent.propTypes = {
     nodeDeleted: React.PropTypes.bool.isRequired,
     nodeAdded: React.PropTypes.bool.isRequired,
     gridSnap: React.PropTypes.bool.isRequired
-  })
+  }),
+  xml: React.PropTypes.shape({
+    track: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired,
+    race: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired
+  }).isRequired
 };
 /* istanbul ignore next */
 AppComponent.defaultProps = {
@@ -133,8 +142,6 @@ AppComponent.defaultProps = {
     setMap: () => {}
   },
   track: {
-    trackText: 'Initial track text (App)',
-    raceText: 'Initial race text (App)',
     markerType: 'DiscConeBlue01',
     trackRendered: true,
     gatesEnabled: false,
@@ -152,6 +159,16 @@ AppComponent.defaultProps = {
     nodeDeleted: true,
     nodeAdded: true,
     gridSnap: false
+  },
+  xml: {
+    track: {
+      id: 'Track Id',
+      value: '--- Hit preview to render Track XML ---'
+    },
+    race: {
+      id: 'Race Id',
+      value: '--- Gates need to be enabled ---'
+    }
   }
 };
 

@@ -19,16 +19,10 @@ describe('<App />', function () {
       addingNode: false,
       height: 1000,
       width: 600,
-      textTrack: '',
-      textRace: '',
       trackRendered: true,
       trackWidth: 17.5,
       map: 'LiftoffArena',
-      trackText: 'trackText',
-      raceText: 'raceText',
       name: 'Trackname',
-      trackText: 'Initial Track text',
-      raceText: 'Initial Race text',
       markerType: 'foo'
     };
 

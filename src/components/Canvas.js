@@ -53,10 +53,10 @@ class Canvas extends React.Component {
       }
 
       track.getTrackXML(this.props.track.name, this.props.track.map,
-        (text, id) => { this.props.actions.setTrackText({ text, id }); });
+        (value, id) => { this.props.actions.setTrackText({ id, value }); });
 
       track.getRaceXML('Race 01',
-        (text, id) => { this.props.actions.setRaceText({ text, id }); });
+        (value, id) => { this.props.actions.setRaceText({ id, value }); });
 
       this.props.actions.renderPreview();
       this.props.actions.enableDownload();

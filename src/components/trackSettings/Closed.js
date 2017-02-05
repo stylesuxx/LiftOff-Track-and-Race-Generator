@@ -23,10 +23,10 @@ class Closed extends React.Component {
 
   zipButtonHandler() {
     const gatesEnabled = this.props.track.gatesEnabled;
-    const trackText = this.props.track.trackText;
-    const raceText = this.props.track.raceText;
-    const trackId = this.props.track.trackId;
-    const raceId = this.props.track.raceId;
+    const trackText = this.props.xml.track.value;
+    const raceText = this.props.xml.race.value;
+    const trackId = this.props.xml.track.id;
+    const raceId = this.props.xml.race.id;
 
     const fileName = `${trackId}.zip`;
     const trackPath = `Liftoff_Data/Tracks/${trackId}/${trackId}.track`;
@@ -155,12 +155,18 @@ Closed.propTypes = {
     trackWidth: React.PropTypes.number.isRequired,
     gatesEnabled: React.PropTypes.bool.isRequired,
     doubleLine: React.PropTypes.bool.isRequired,
-    trackText: React.PropTypes.string.isRequired,
-    raceText: React.PropTypes.string.isRequired,
-    download: React.PropTypes.bool.isRequired,
-    trackId: React.PropTypes.string.isRequired,
-    raceId: React.PropTypes.string.isRequired
-  })
+    download: React.PropTypes.bool.isRequired
+  }),
+  xml: React.PropTypes.shape({
+    track: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired,
+    race: React.PropTypes.shape({
+      id: React.PropTypes.string.isRequired,
+      value: React.PropTypes.string.isRequired
+    }).isRequired
+  }).isRequired
 };
 /* istanbul ignore next */
 Closed.defaultProps = {
@@ -181,11 +187,17 @@ Closed.defaultProps = {
     markerSpacing: 20,
     gateSpacing: 100,
     trackWidth: 17.5,
-    trackText: 'Initial Track text',
-    raceText: 'Initial Race text',
-    download: false,
-    trackId: 'Race Id',
-    raceId: 'Race Id'
+    download: false
+  },
+  xml: {
+    track: {
+      id: 'Track Id',
+      value: '--- Hit preview to render Track XML ---'
+    },
+    race: {
+      id: 'Race Id',
+      value: '--- Gates need to be enabled ---'
+    }
   }
 };
 

@@ -12,8 +12,6 @@ import {
   CLOSE_TRACK,
   OPEN_TRACK,
   RENDER_PREVIEW,
-  SET_TRACK_TEXT,
-  SET_RACE_TEXT,
   SET_NAME,
   ENABLE_DOWNLOAD,
   SET_MARKER_TYPE
@@ -146,34 +144,6 @@ describe('track reducer', () => {
 
     it('should reset the closed prop', (done) => {
       expect(newState.trackWidth).to.eql(20.1);
-      done();
-    });
-  });
-
-  describe('SET_TRACK_TEXT action', (done) => {
-    const state = Object.freeze({ trackText: 'old', trackId: 'foo' });
-    const newState = reducer(state, {type: SET_TRACK_TEXT, parameter: {
-      text: 'new',
-      id: 'bar'
-    }});
-
-    it('should set the track text', (done) => {
-      expect(newState.trackText).to.eql('new');
-      expect(newState.trackId).to.eql('bar');
-      done();
-    });
-  });
-
-  describe('SET_RACE_TEXT action', (done) => {
-    const state = Object.freeze({ raceText: 'old', raceId: 'foo' });
-    const newState = reducer(state, {type: SET_RACE_TEXT, parameter: {
-      text: 'new',
-      id: 'bar'
-    }});
-
-    it('should set the race text', (done) => {
-      expect(newState.raceText).to.eql('new');
-      expect(newState.raceId).to.eql('bar');
       done();
     });
   });

@@ -15,15 +15,15 @@ import {
   CLOSE_TRACK,
   OPEN_TRACK,
   RENDER_PREVIEW,
-  SET_TRACK_TEXT,
-  SET_RACE_TEXT,
   SET_NAME,
   ENABLE_DOWNLOAD,
   SET_MARKER_TYPE
 } from '../actions/const';
 
 const initialState = {
+  markerType: 'DiscConeBlue01',
   map: 'LiftoffArena',
+  name: 'Trackname',
   gatesEnabled: false,
   addingNode: false,
   doubleLine: false,
@@ -35,12 +35,6 @@ const initialState = {
   height: 1000,
   trackRendered: true,
   download: false,
-  name: 'Trackname',
-  trackText: 'Hit preview to render Track XML',
-  raceText: 'Hit preview to render Race XML',
-  trackId: 'Track Id',
-  raceId: 'Track Id',
-  markerType: 'DiscConeBlue01'
 };
 
 function reducer(state = initialState, action) {
@@ -99,18 +93,6 @@ function reducer(state = initialState, action) {
 
     case SET_TRACK_WIDTH: {
       nextState.trackWidth = parseFloat(action.parameter, 10);
-      return nextState;
-    }
-
-    case SET_TRACK_TEXT: {
-      nextState.trackText = action.parameter.text;
-      nextState.trackId = action.parameter.id;
-      return nextState;
-    }
-
-    case SET_RACE_TEXT: {
-      nextState.raceText = action.parameter.text;
-      nextState.raceId = action.parameter.id;
       return nextState;
     }
 

@@ -14,11 +14,7 @@ describe('<Closed />', function () {
       gateSpacing: 100,
       doubleLine: true,
       trackWidth: 17.5,
-      download: false,
-      trackText: 'Initial Track text',
-      raceText: 'Initial Race text',
-      trackId: 'Track Id',
-      raceId: 'Race Id'
+      download: false
     };
 
     actions = {
