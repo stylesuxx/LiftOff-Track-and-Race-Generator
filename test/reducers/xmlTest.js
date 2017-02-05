@@ -1,6 +1,7 @@
 import {
   SET_TRACK_TEXT,
-  SET_RACE_TEXT
+  SET_RACE_TEXT,
+  ENABLE_DOWNLOAD
 } from '../../src/actions/const';
 var reducer = require('../../src/reducers/xml');
 
@@ -64,6 +65,16 @@ describe('xml', () => {
 
     it('should set the race value', (done) => {
       expect(newState.race.value).to.eql('bar');
+      done();
+    });
+  });
+
+  describe('ENABLE_DOWNLOAD action', (done) => {
+    const state = Object.freeze({ download: false });
+    const newState = reducer(state, { type: ENABLE_DOWNLOAD });
+
+    it('should set the download prop', (done) => {
+      expect(newState.download).to.be.true;
       done();
     });
   });

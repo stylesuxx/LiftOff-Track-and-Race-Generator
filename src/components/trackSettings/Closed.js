@@ -47,7 +47,7 @@ class Closed extends React.Component {
   render() {
     const gatesEnabled = this.props.track.gatesEnabled;
     const doubleLine = this.props.track.doubleLine;
-    const download = this.props.track.download;
+    const download = this.props.xml.download;
 
     const toggleGates = this.props.actions.toggleGates;
     const toggleDoubleLine = this.props.actions.toggleDoubleLine;
@@ -154,10 +154,10 @@ Closed.propTypes = {
     gateSpacing: React.PropTypes.number.isRequired,
     trackWidth: React.PropTypes.number.isRequired,
     gatesEnabled: React.PropTypes.bool.isRequired,
-    doubleLine: React.PropTypes.bool.isRequired,
-    download: React.PropTypes.bool.isRequired
+    doubleLine: React.PropTypes.bool.isRequired
   }),
   xml: React.PropTypes.shape({
+    download: React.PropTypes.bool.isRequired,
     track: React.PropTypes.shape({
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
@@ -186,10 +186,10 @@ Closed.defaultProps = {
     doubleLine: false,
     markerSpacing: 20,
     gateSpacing: 100,
-    trackWidth: 17.5,
-    download: false
+    trackWidth: 17.5
   },
   xml: {
+    download: false,
     track: {
       id: 'Track Id',
       value: '--- Hit preview to render Track XML ---'

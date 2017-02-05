@@ -50,6 +50,7 @@ TrackSettings.propTypes = {
     closed: React.PropTypes.bool.isRequired
   }),
   xml: React.PropTypes.shape({
+    download: React.PropTypes.bool.isRequired,
     track: React.PropTypes.shape({
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
@@ -86,6 +87,7 @@ TrackSettings.defaultProps = {
     closed: false
   },
   xml: {
+    download: false,
     track: {
       id: 'Track Id',
       value: '--- Hit preview to render Track XML ---'

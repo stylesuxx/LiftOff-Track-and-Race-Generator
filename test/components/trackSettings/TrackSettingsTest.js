@@ -18,13 +18,13 @@ describe('<TrackSettings />', function () {
 
   describe('when rendering the component with a closed track', function () {
     var track = {
-      closed: true,
       gateSpacing: 20,
       doubleLine: false,
       markerSpacing: 20,
       gatesEnabled: false,
       trackWidth: 17.5,
-      download: false
+      download: false,
+      closed: true,
     };
 
     component = shallow(<TrackSettings track={track} />);

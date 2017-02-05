@@ -7,14 +7,26 @@ describe('<Closed />', function () {
   let component;
   let actions;
   let track;
+  let xml;
   beforeEach(function () {
     track = {
       gatesEnabled: false,
       markerSpacing: 20,
       gateSpacing: 100,
       doubleLine: true,
-      trackWidth: 17.5,
-      download: false
+      trackWidth: 17.5
+    };
+
+    xml = {
+      download: false,
+      track: {
+        id: 'track id',
+        value: 'track value',
+      },
+      race: {
+        id: 'race id',
+        value: 'race value',
+      }
     };
 
     actions = {
@@ -57,8 +69,8 @@ describe('<Closed />', function () {
 
   describe('when downloads are enabled', function () {
     it('should have a className of "closed-component"', function () {
-      track.download = true;
-      component = mount(<Closed track={track} />);
+      xml.download = true;
+      component = mount(<Closed track={track} xml={xml} />);
       const wrapper = component.find('.download');
       wrapper.simulate('click');
 
@@ -68,11 +80,11 @@ describe('<Closed />', function () {
 
   describe('when downloads and gates enabled', function () {
     it('should have a className of "closed-component"', function () {
-      track.download = true;
+      xml.download = true;
       track.gatesEnabled = true;
       track.doubleLine = false;
 
-      component = mount(<Closed track={track} />);
+      component = mount(<Closed track={track} xml={xml} />);
       const wrapper = component.find('.download');
       wrapper.simulate('click');
 

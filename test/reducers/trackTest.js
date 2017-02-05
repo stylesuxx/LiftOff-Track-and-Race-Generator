@@ -13,7 +13,6 @@ import {
   OPEN_TRACK,
   RENDER_PREVIEW,
   SET_NAME,
-  ENABLE_DOWNLOAD,
   SET_MARKER_TYPE
 } from '../../src/actions/const';
 
@@ -154,16 +153,6 @@ describe('track reducer', () => {
 
     it('should set the name', (done) => {
       expect(newState.name).to.eql('new');
-      done();
-    });
-  });
-
-  describe('ENABLE_DOWNLOAD action', (done) => {
-    const state = Object.freeze({ download: false });
-    const newState = reducer(state, { type: ENABLE_DOWNLOAD });
-
-    it('should set the download prop', (done) => {
-      expect(newState.download).to.be.true;
       done();
     });
   });

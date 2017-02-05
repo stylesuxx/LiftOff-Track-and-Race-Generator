@@ -109,6 +109,7 @@ AppComponent.propTypes = {
     gridSnap: React.PropTypes.bool.isRequired
   }),
   xml: React.PropTypes.shape({
+    download: React.PropTypes.bool.isRequired,
     track: React.PropTypes.shape({
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
@@ -161,6 +162,7 @@ AppComponent.defaultProps = {
     gridSnap: false
   },
   xml: {
+    download: false,
     track: {
       id: 'Track Id',
       value: '--- Hit preview to render Track XML ---'

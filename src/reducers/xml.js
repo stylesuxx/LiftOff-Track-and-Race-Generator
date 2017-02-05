@@ -5,10 +5,12 @@
  */
 import {
   SET_TRACK_TEXT,
-  SET_RACE_TEXT
+  SET_RACE_TEXT,
+  ENABLE_DOWNLOAD,
 } from '../actions/const';
 
 const initialState = {
+  download: false,
   track: {
     id: 'Track Id',
     value: '--- Hit preview to render Track XML ---'
@@ -34,6 +36,11 @@ function reducer(state = initialState, action) {
       nextState.race.id = action.parameter.id;
       nextState.race.value = action.parameter.value;
 
+      return nextState;
+    }
+
+    case ENABLE_DOWNLOAD: {
+      nextState.download = true;
       return nextState;
     }
 

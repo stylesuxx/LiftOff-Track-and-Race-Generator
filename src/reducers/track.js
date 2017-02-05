@@ -16,16 +16,14 @@ import {
   OPEN_TRACK,
   RENDER_PREVIEW,
   SET_NAME,
-  ENABLE_DOWNLOAD,
   SET_MARKER_TYPE
 } from '../actions/const';
 
 const initialState = {
   markerType: 'DiscConeBlue01',
+  name: 'Trackname 01',
   map: 'LiftoffArena',
-  name: 'Trackname',
   gatesEnabled: false,
-  addingNode: false,
   doubleLine: false,
   markerSpacing: 20,
   gateSpacing: 100,
@@ -33,8 +31,9 @@ const initialState = {
   closed: false,
   width: 600,
   height: 1000,
+
   trackRendered: true,
-  download: false,
+  addingNode: false,
 };
 
 function reducer(state = initialState, action) {
@@ -98,11 +97,6 @@ function reducer(state = initialState, action) {
 
     case SET_NAME: {
       nextState.name = action.parameter;
-      return nextState;
-    }
-
-    case ENABLE_DOWNLOAD: {
-      nextState.download = true;
       return nextState;
     }
 
