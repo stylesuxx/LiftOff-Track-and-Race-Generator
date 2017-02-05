@@ -1,9 +1,0 @@
-{
-  "generator-react-webpack": {
-    "appName": "liftoff-track-and-race-generator",
-    "style": "scss",
-    "cssmodules": true,
-    "postcss": false,
-    "generatedWithVersion": 4
-  }
-}
