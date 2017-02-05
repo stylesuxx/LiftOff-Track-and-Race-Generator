@@ -1,17 +1,21 @@
 footer {
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 2px;
+  padding-top: 4px;
   border-top: 1px solid black;
   font-size: 12px;
 
-  a,
-  a:active,
-  a:hover {
-    color: black;
-    text-decoration: none;
-  }
+  p {
+    margin-bottom: 4px;
 
-  a:hover {
-    text-decoration: underline;
+    a,
+    a:active,
+    a:hover {
+      color: black;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   }
 }

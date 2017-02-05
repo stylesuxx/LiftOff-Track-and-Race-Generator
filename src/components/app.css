@@ -3,7 +3,7 @@ body {
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
-  padding-top: 15px;
+  padding-top: 10px;
 }
 
 a,
@@ -18,7 +18,7 @@ a:hover {
 }
 
 .main-content {
-  margin-top: 15px;
+  margin-top: 10px;
   display: flex;
 }
 
