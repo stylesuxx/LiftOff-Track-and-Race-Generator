@@ -35,13 +35,14 @@ import Main from '../components/App';
 /* Populated by react-webpack-redux:reducer */
 class App extends Component {
   render() {
-    const {actions, track, canvas, xml} = this.props;
+    const {actions, track, canvas, xml, liftoff} = this.props;
     return (
       <Main
         actions={actions}
         track={track}
         canvas={canvas}
-        xml={xml}/>
+        xml={xml}
+        liftoff={liftoff}/>
     );
   }
 }
@@ -98,14 +99,23 @@ App.propTypes = {
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
     }).isRequired
-  }).isRequired
+  }).isRequired,
+  liftoff: React.PropTypes.shape({
+    markers: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
+    ).isRequired
+  })
 };
 function mapStateToProps(state) {
   /* Populated by react-webpack-redux:reducer */
   const props = {
     canvas: state.canvas,
     track: state.track,
-    xml: state.xml
+    xml: state.xml,
+    liftoff: state.liftoff
   };
   return props;
 }

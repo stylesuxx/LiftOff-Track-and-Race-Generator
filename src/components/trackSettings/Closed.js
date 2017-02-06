@@ -14,45 +14,6 @@ import styles from './closed.cssmodule.scss';
 import MonitoredTextbox from '../MonitoredTextbox';
 import MonitoredSelectbox from '../MonitoredSelectbox';
 
-const markerTypes = [
-  {
-    value: 'DiscConeBlue01',
-    text: 'Blue Disc'
-  },
-  {
-    value: 'DiscConeOrange01',
-    text: 'Orange Disc'
-  },
-  {
-    value: 'DiscConeRed01',
-    text: 'Red Disc'
-  },
-  {
-    value: 'DiscConeYellow01',
-    text: 'Yellow Disc'
-  },
-  {
-    value: 'DiscConeMagenta01',
-    text: 'Magenta Disc'
-  },
-  {
-    value: 'DiscConeGreen01',
-    text: 'Greend Disc'
-  },
-  {
-    value: 'TrafficCone01',
-    text: 'Traffic Cone'
-  },
-  {
-    value: 'DangerPyramid01',
-    text: 'Danger Pyramid'
-  },
-  {
-    value: 'AirPylonLuGusStudios01',
-    text: 'Air Polygon'
-  }
-];
-
 class Closed extends React.Component {
   constructor(props) {
     super(props);
@@ -154,7 +115,7 @@ class Closed extends React.Component {
               <MonitoredSelectbox
                 updateSelection={this.props.actions.setMarkerType}
                 selected={this.props.track.markerType}
-                options={markerTypes}
+                options={this.props.liftoff.markers}
               />&nbsp;
 
               <Button
@@ -208,7 +169,15 @@ Closed.propTypes = {
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
     }).isRequired
-  }).isRequired
+  }).isRequired,
+  liftoff: React.PropTypes.shape({
+    markers: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
+    ).isRequired
+  })
 };
 /* istanbul ignore next */
 Closed.defaultProps = {
@@ -241,6 +210,9 @@ Closed.defaultProps = {
       id: 'Race Id',
       value: '--- Gates need to be enabled ---'
     }
+  },
+  liftoff: {
+    markers: []
   }
 };
 

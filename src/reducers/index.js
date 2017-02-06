@@ -9,13 +9,15 @@
  */
 /* Populated by react-webpack-redux:reducer */
 import { combineReducers } from 'redux';
+import liftoff from '../reducers/liftoff.js';
 import xml from '../reducers/xml.js';
 import canvas from '../reducers/canvas.js';
 import track from '../reducers/track.js';
 const reducers = {
   track,
   canvas,
-  xml
+  xml,
+  liftoff
 };
 const combined = combineReducers(reducers);
 module.exports = combined;

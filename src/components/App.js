@@ -34,7 +34,8 @@ class AppComponent extends React.Component {
           actions={this.props.actions}
           canvas={this.props.canvas}
           track={this.props.track}
-          xml={this.props.xml} />
+          xml={this.props.xml}
+          liftoff={this.props.liftoff} />
 
         <Row>
           <Col md={12}>
@@ -117,7 +118,15 @@ AppComponent.propTypes = {
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
     }).isRequired
-  }).isRequired
+  }).isRequired,
+  liftoff: React.PropTypes.shape({
+    markers: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
+    ).isRequired
+  })
 };
 /* istanbul ignore next */
 AppComponent.defaultProps = {
@@ -169,6 +178,9 @@ AppComponent.defaultProps = {
       id: 'Race Id',
       value: '--- Gates need to be enabled ---'
     }
+  },
+  liftoff: {
+    markers: []
   }
 };
 

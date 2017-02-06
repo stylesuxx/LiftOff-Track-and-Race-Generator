@@ -13,7 +13,8 @@ class TrackSettings extends React.Component {
           className="tracksettings-component"
           track={this.props.track}
           actions={this.props.actions}
-          xml={this.props.xml} />
+          xml={this.props.xml}
+          liftoff={this.props.liftoff} />
       );
     }
 
@@ -60,7 +61,15 @@ TrackSettings.propTypes = {
       id: React.PropTypes.string.isRequired,
       value: React.PropTypes.string.isRequired
     }).isRequired
-  }).isRequired
+  }).isRequired,
+  liftoff: React.PropTypes.shape({
+    markers: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
+    ).isRequired
+  })
 };
 /* istanbul ignore next */
 TrackSettings.defaultProps = {
@@ -98,6 +107,9 @@ TrackSettings.defaultProps = {
       id: 'Race Id',
       value: '--- Gates need to be enabled ---'
     }
+  },
+  liftoff: {
+    markers: []
   }
 };
 
