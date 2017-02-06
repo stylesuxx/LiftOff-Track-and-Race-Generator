@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import MonitoredTextbox from 'components/trackSettings/MonitoredTextbox.js';
+import MonitoredTextbox from 'components/MonitoredTextbox.js';
 
 describe('<MonitoredTextbox />', function () {
 

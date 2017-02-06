@@ -9,7 +9,7 @@ import {
   Col
 } from 'react-bootstrap';
 import styles from './open.cssmodule.scss';
-import MonitoredTextbox from './MonitoredTextbox';
+import MonitoredTextbox from '../MonitoredTextbox';
 
 class Open extends React.Component {
 

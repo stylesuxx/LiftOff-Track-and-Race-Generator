@@ -11,8 +11,47 @@ import {
 } from 'react-bootstrap';
 import styles from './closed.cssmodule.scss';
 
-import MonitoredTextbox from './MonitoredTextbox';
-import MarkerSelection from './MarkerSelection';
+import MonitoredTextbox from '../MonitoredTextbox';
+import MonitoredSelectbox from '../MonitoredSelectbox';
+
+const markerTypes = [
+  {
+    value: 'DiscConeBlue01',
+    text: 'Blue Disc'
+  },
+  {
+    value: 'DiscConeOrange01',
+    text: 'Orange Disc'
+  },
+  {
+    value: 'DiscConeRed01',
+    text: 'Red Disc'
+  },
+  {
+    value: 'DiscConeYellow01',
+    text: 'Yellow Disc'
+  },
+  {
+    value: 'DiscConeMagenta01',
+    text: 'Magenta Disc'
+  },
+  {
+    value: 'DiscConeGreen01',
+    text: 'Greend Disc'
+  },
+  {
+    value: 'TrafficCone01',
+    text: 'Traffic Cone'
+  },
+  {
+    value: 'DangerPyramid01',
+    text: 'Danger Pyramid'
+  },
+  {
+    value: 'AirPylonLuGusStudios01',
+    text: 'Air Polygon'
+  }
+];
 
 class Closed extends React.Component {
   constructor(props) {
@@ -112,9 +151,10 @@ class Closed extends React.Component {
                 value={this.props.track.markerSpacing}
                 label="Spacing" />&nbsp;
 
-              <MarkerSelection
-                setMarkerType={this.props.actions.setMarkerType}
-               />&nbsp;
+              <MonitoredSelectbox
+                updateSelection={this.props.actions.setMarkerType}
+                options={markerTypes}
+              />&nbsp;
 
               <Button
                 className={styles.fixedWidth}
