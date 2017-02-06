@@ -43,8 +43,8 @@ describe('Liftoff', function () {
     });
 
     it('it should be possible to drag a node', function() {
-      canvas.startDragging({ pageX: 20, pageY: 20 });
-      canvas.dragging({ pageX: 100, pageY: 200 });
+      canvas.startDragging({ clientX: 20, clientY: 20 });
+      canvas.dragging({ clientX: 100, clientY: 200 });
       canvas.stopDragging();
 
       expect(canvas.nodes[0].x).to.eql(100);
@@ -52,8 +52,8 @@ describe('Liftoff', function () {
     });
 
     it('it should be possible to drag empty space', function() {
-      canvas.startDragging({ pageX: 0, pageY: 0 });
-      canvas.dragging({ pageX: 100, pageY: 200 });
+      canvas.startDragging({ clientX: 0, clientY: 0 });
+      canvas.dragging({ clientX: 100, clientY: 200 });
       canvas.stopDragging();
 
       expect(canvas.nodes[0].x).to.eql(20);
@@ -62,8 +62,8 @@ describe('Liftoff', function () {
 
     it('it should place a dragged node to the next gridsnap point', function() {
       canvas.setGridSnap(true);
-      canvas.startDragging({ pageX: 20, pageY: 20 });
-      canvas.dragging({ pageX: 103, pageY: 196 });
+      canvas.startDragging({ clientX: 20, clientY: 20 });
+      canvas.dragging({ clientX: 103, clientY: 196 });
       canvas.stopDragging();
 
       expect(canvas.nodes[0].x).to.eql(100);
@@ -71,15 +71,15 @@ describe('Liftoff', function () {
     });
 
     it('it should not be possible to drag a node outside the canvas', function() {
-      canvas.startDragging({ pageX: 20, pageY: 20 });
-      canvas.dragging({ pageX: 10000, pageY: 10000 });
+      canvas.startDragging({ clientX: 20, clientY: 20 });
+      canvas.dragging({ clientX: 10000, clientY: 10000 });
       canvas.stopDragging();
 
       expect(canvas.nodes[0].x).to.eql(600);
       expect(canvas.nodes[0].y).to.eql(1000);
 
-      canvas.startDragging({ pageX: 600, pageY: 1000 });
-      canvas.dragging({ pageX: -1000, pageY: -1000 });
+      canvas.startDragging({ clientX: 600, clientY: 1000 });
+      canvas.dragging({ clientX: -1000, clientY: -1000 });
       canvas.stopDragging();
 
       expect(canvas.nodes[0].x).to.eql(0);
@@ -88,7 +88,7 @@ describe('Liftoff', function () {
 
     it('it should be possible to add a node', function() {
       canvas.addNode();
-      canvas.adding({ pageX: 100, pageY: 200 });
+      canvas.adding({ clientX: 100, clientY: 200 });
       canvas.stopAdding();
 
       expect(canvas.nodes[4].x).to.eql(100);
@@ -105,7 +105,7 @@ describe('Liftoff', function () {
     it('it should place an added node to the next gridsnap point', function() {
       canvas.setGridSnap(true);
       canvas.addNode();
-      canvas.adding({ pageX: 103, pageY: 196 });
+      canvas.adding({ clientX: 103, clientY: 196 });
       canvas.stopAdding();
 
       expect(canvas.nodes[4].x).to.eql(100);
@@ -120,7 +120,7 @@ describe('Liftoff', function () {
     });
 
     it('it should not trigger adding when no node has been added', function() {
-      canvas.adding({ pageX: 20, pageY: 20 });
+      canvas.adding({ clientX: 20, clientY: 20 });
     });
 
     it('it should be possible to set the closed state', function() {
