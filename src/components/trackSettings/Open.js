@@ -1,7 +1,6 @@
 import React from 'react';
 import cssmodules from 'react-css-modules';
 import {
-  FormControl,
   FormGroup,
   Button,
   Form,
@@ -10,18 +9,9 @@ import {
 } from 'react-bootstrap';
 import styles from './open.cssmodule.scss';
 import MonitoredTextbox from '../MonitoredTextbox';
+import MonitoredSelectbox from '../MonitoredSelectbox';
 
 class Open extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.handleMapChange = this.handleMapChange.bind(this);
-  }
-
-  handleMapChange(event) {
-    this.props.actions.setMap(event.target.value);
-  }
 
   render() {
     return (
@@ -42,13 +32,11 @@ class Open extends React.Component {
                 onClick={this.props.actions.deletePoint}
               >Delete Point</Button>&nbsp;
 
-              <FormControl
-                componentClass="select"
-                onChange={this.handleMapChange}
-              >
-                <option value="LiftoffArena">Liftoff Arena</option>
-                <option value="TheDrawingBoard">The Drawing Board</option>
-              </FormControl>&nbsp;
+              <MonitoredSelectbox
+                updateSelection={this.props.actions.setMap}
+                selected={this.props.track.map}
+                options={this.props.liftoff.maps}
+              />&nbsp;
 
               <MonitoredTextbox
                 label=""
@@ -81,7 +69,16 @@ Open.propTypes = {
     setMap: React.PropTypes.func.isRequired,
   }).isRequired,
   track: React.PropTypes.shape({
-    name: React.PropTypes.string.isRequired
+    name: React.PropTypes.string.isRequired,
+    map: React.PropTypes.string.isRequired
+  }),
+  liftoff: React.PropTypes.shape({
+    maps: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
+    )
   })
 };
 /* istanbul ignore next */
@@ -94,7 +91,11 @@ Open.defaultProps = {
     setMap: () => {}
   },
   track: {
-    name: 'Trackname'
+    name: 'name (Open.js)',
+    map: 'map (Open.js)',
+  },
+  liftoff: {
+    maps: []
   }
 };
 

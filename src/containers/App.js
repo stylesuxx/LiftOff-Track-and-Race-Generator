@@ -106,6 +106,12 @@ App.propTypes = {
         value: React.PropTypes.string.isRequired,
         text: React.PropTypes.string.isRequired
       })
+    ).isRequired,
+    maps: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
     ).isRequired
   })
 };

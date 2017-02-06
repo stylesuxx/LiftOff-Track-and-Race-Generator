@@ -43,6 +43,16 @@ const initialState = {
       value: 'AirPylonLuGusStudios01',
       text: 'Air Polygon'
     }
+  ],
+  maps: [
+    {
+      value: 'LiftoffArena',
+      text: 'Liftoff Arena'
+    },
+    {
+      value: 'TheDrawingBoard',
+      text: 'The Drawing Board'
+    }
   ]
 };
 

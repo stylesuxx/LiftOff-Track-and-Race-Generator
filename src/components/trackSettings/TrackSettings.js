@@ -21,7 +21,9 @@ class TrackSettings extends React.Component {
     return (
       <Open
         className="tracksettings-component"
-        actions={this.props.actions} />
+        actions={this.props.actions}
+        liftoff={this.props.liftoff}
+        track={this.props.track} />
     );
   }
 }
@@ -68,6 +70,12 @@ TrackSettings.propTypes = {
         value: React.PropTypes.string.isRequired,
         text: React.PropTypes.string.isRequired
       })
+    ).isRequired,
+    maps: React.PropTypes.arrayOf(
+      React.PropTypes.shape({
+        value: React.PropTypes.string.isRequired,
+        text: React.PropTypes.string.isRequired
+      })
     ).isRequired
   })
 };
@@ -91,6 +99,8 @@ TrackSettings.defaultProps = {
   },
   track: {
     markerType: 'DiscConeBlue01 (Tracksettings.js)',
+    name: 'name (Tracksettings.js)',
+    map: 'map (Tracksettings.js)',
     gatesEnabled: false,
     markerSpacing: 20,
     doubleLine: false,
@@ -109,7 +119,8 @@ TrackSettings.defaultProps = {
     }
   },
   liftoff: {
-    markers: []
+    markers: [],
+    maps: []
   }
 };
 
