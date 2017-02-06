@@ -153,6 +153,7 @@ class Closed extends React.Component {
 
               <MonitoredSelectbox
                 updateSelection={this.props.actions.setMarkerType}
+                selected={this.props.track.markerType}
                 options={markerTypes}
               />&nbsp;
 
@@ -193,6 +194,7 @@ Closed.propTypes = {
     markerSpacing: React.PropTypes.number.isRequired,
     gateSpacing: React.PropTypes.number.isRequired,
     trackWidth: React.PropTypes.number.isRequired,
+    markerType: React.PropTypes.string.isRequired,
     gatesEnabled: React.PropTypes.bool.isRequired,
     doubleLine: React.PropTypes.bool.isRequired
   }),
@@ -222,6 +224,7 @@ Closed.defaultProps = {
     openTrack: () => {}
   },
   track: {
+    markerType: 'DiscConeBlue01 (Closed.js)',
     gatesEnabled: false,
     doubleLine: false,
     markerSpacing: 20,

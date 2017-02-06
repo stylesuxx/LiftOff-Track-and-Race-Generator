@@ -46,6 +46,7 @@ TrackSettings.propTypes = {
     markerSpacing: React.PropTypes.number.isRequired,
     gateSpacing: React.PropTypes.number.isRequired,
     gatesEnabled: React.PropTypes.bool.isRequired,
+    markerType: React.PropTypes.string.isRequired,
     doubleLine: React.PropTypes.bool.isRequired,
     closed: React.PropTypes.bool.isRequired
   }),
@@ -80,6 +81,7 @@ TrackSettings.defaultProps = {
     setMap: () => {}
   },
   track: {
+    markerType: 'DiscConeBlue01 (Tracksettings.js)',
     gatesEnabled: false,
     markerSpacing: 20,
     doubleLine: false,

@@ -20,6 +20,7 @@ class MonitoredSelectbox extends React.Component {
       <FormControl
         className="monitoredselectbox-component"
         componentClass="select"
+        defaultValue={this.props.selected}
         onChange={this.handleChange}
       >
         {this.props.options.map(option => (
@@ -35,6 +36,7 @@ class MonitoredSelectbox extends React.Component {
 MonitoredSelectbox.displayName = 'MonitoredSelectbox';
 MonitoredSelectbox.propTypes = {
   updateSelection: React.PropTypes.func.isRequired,
+  selected: React.PropTypes.string,
   options: React.PropTypes.arrayOf(
     React.PropTypes.shape({
       value: React.PropTypes.string.isRequired,

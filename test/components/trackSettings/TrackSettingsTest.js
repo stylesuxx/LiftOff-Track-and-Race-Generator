@@ -25,6 +25,7 @@ describe('<TrackSettings />', function () {
       trackWidth: 17.5,
       download: false,
       closed: true,
+      markerType: 'foo',
     };
 
     component = shallow(<TrackSettings track={track} />);

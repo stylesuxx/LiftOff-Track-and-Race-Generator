@@ -14,7 +14,8 @@ describe('<Closed />', function () {
       markerSpacing: 20,
       gateSpacing: 100,
       doubleLine: true,
-      trackWidth: 17.5
+      trackWidth: 17.5,
+      markerType: 'foo'
     };
 
     xml = {
