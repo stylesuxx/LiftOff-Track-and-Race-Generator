@@ -249,8 +249,9 @@ class Canvas {
 
   mousePos(e) {
     const rect = this.canvas.getBoundingClientRect();
-    let x = e.pageX - rect.left;
-    let y = e.pageY - rect.top;
+
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
 
     x = (x > this.width) ? this.width : x;
     y = (y > this.height) ? this.height : y;
