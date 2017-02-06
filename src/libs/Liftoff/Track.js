@@ -172,8 +172,8 @@ class Track {
   }
 
   getTrackBlueprint(marker, gate, zOffset) {
-    const markerType = marker || 'DiscConeBlue01';
-    const gateType = gate || 'AirgateBigLiftoffDark01';
+    const markerType = marker;
+    const gateType = gate;
     const track = [];
 
     const getBlueprint = (id, p, type, z, rotation = 0) => {
@@ -297,6 +297,7 @@ class Track {
           checkpoint = getCheckpoint('Start', index, 'Start', 'RightToLeft', i + 1);
 
           const finish = getCheckpoint('Finish', index, 'Finish', 'RightToLeft', i + 1);
+          delete finish.nextPassageIDs;
           r.Race.checkPointPassages.RaceCheckpointPassage.push(finish);
         }
 
