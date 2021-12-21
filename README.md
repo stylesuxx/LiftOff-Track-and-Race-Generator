@@ -1,4 +1,3 @@
-
 # LiftOff Track and Race Generator
 Check out the [LiftOff Track and Race Generator](https://stylesuxx.github.io/LiftOff-Track-and-Race-Generator/)
 
@@ -32,3 +31,12 @@ First make sure to install all the dependencies:
 Then run the development server:
 
     yarn start
+
+## Build
+Build the distributable files
+
+    yarn dist
+
+Check out the `gh-pages` branch and copy the freshly build files from the `dist` directory to root, commit and push.
+
+    cp -r dist/* .
