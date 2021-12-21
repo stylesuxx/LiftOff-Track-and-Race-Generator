@@ -225,7 +225,7 @@ class Track {
     const trackXML = '<?xml version="1.0" encoding="utf-16"?><Track xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><gameVersion>0.8.1</gameVersion><localID><str /><version>1</version><type>TRACK</type></localID><name /><description /><dependencies /><environment /><blueprints></blueprints><lastTrackItemID>0</lastTrackItemID></Track>';
     const that = this;
     const markerType = this.markerType;
-    const gateType = null;
+    const gateType = 'AirgateBigLiftoffDark01';
     const z = this.maps[map].z;
     const id = this.trackId;
 

@@ -30,6 +30,7 @@ class Canvas extends React.Component {
     }
 
     if (!nextProps.canvas.trackRendered) {
+      const name = this.props.track.name;
       const doubleLine = this.props.track.doubleLine;
       const markerSpacing = this.props.track.markerSpacing;
       const gateSpacing = this.props.track.gateSpacing;
@@ -55,7 +56,7 @@ class Canvas extends React.Component {
       track.getTrackXML(this.props.track.name, this.props.track.map,
         (value, id) => { this.props.actions.setTrackText({ id, value }); });
 
-      track.getRaceXML('Race 01',
+      track.getRaceXML(name,
         (value, id) => { this.props.actions.setRaceText({ id, value }); });
 
       this.props.actions.renderPreview();
