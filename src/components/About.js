@@ -54,7 +54,7 @@ class About extends React.Component {
             not be the best experience on mobile devices. Preferably use a screen
             with some insane resolution. Or zoom to fit.</p>
 
-          <p><b>Latest tested LiftOff Version: 0.8.2</b></p>
+          <p><b>Latest tested LiftOff Version: 1.3.15</b></p>
         </div>
 
         <div className="video">
