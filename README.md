@@ -27,4 +27,8 @@ Check out the [LiftOff Track and Race Generator](https://stylesuxx.github.io/Lif
 ## Development
 First make sure to install all the dependencies:
 
-    npm install
+    yarn install
+
+Then run the development server:
+
+    yarn start
